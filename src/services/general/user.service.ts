@@ -1,0 +1,351 @@
+import { Request, Response } from 'express';
+import UserRepository from '../../repositories/general/UserRepository';
+import AuthMiddleware from '../../auth/jwt';
+import PasswordManager from '../../auth/passwordManager';
+import asyncHandler from '../../common/asyncHandler';
+import OTP from "../../lib/classes/Otp";
+import RoleRepository from '../../repositories/rbac/roles.repository';
+import { ErrorResponse } from '../../middlewares/errorHandler';
+import RegisterDTO from '../../dto/classes/Register.dto';
+import emailService from './email.service';
+const PasswordManagerClass = new PasswordManager();
+import emailTemplates from '../../lib/emailTemplates.json';
+
+class UserService {
+
+  //app logics
+
+  static visitorLogin = asyncHandler(async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+
+    const user = await UserRepository.findUserByEmail(email);
+
+    if (!user || user === null) {
+      res.generalResponse("User Not Found!", user);
+    } else if (user['Role.type'] !== 'VISITOR') {
+      res.generalError("You are not allowed to access this resource", {}, 401)
+    } else {
+      const isCorrectPass = await PasswordManagerClass.comparePassword(user.password, password)
+      if (!isCorrectPass) {
+        res.generalError("Username or password is invalid", {}, 401)
+      } else {
+        const jwt = AuthMiddleware.createJwt({
+          id: user.id,
+          roleId: user.roleId,
+          email: user.email
+        })
+
+        delete user.password
+
+        res.generalResponse("Login Successful", { ...user, token: jwt });
+      }
+    }
+
+  })
+
+
+  static adminLogin = asyncHandler(async (req: Request, res: Response) => {
+
+    const { email, password } = req.body;
+    // console.log("req.body", req.body)
+    const user = await UserRepository.findUserByEmail(email);
+    // console.log("user", user)
+
+    if (!user || user === null) {
+      res.generalError("Username or password is not valid!", {}, 404);
+    } else if (user['Role.type'] !== 'ADMIN') {
+      res.generalError("You are not allowed to access this resource", {}, 401)
+    } else {
+      const isCorrectPass = await PasswordManagerClass.comparePassword(user.password, password)
+      console.log("isCorrectPass", isCorrectPass)
+      if (!isCorrectPass) {
+        res.generalError("Username or password is invalid", {}, 401)
+      } else {
+        const jwt = AuthMiddleware.createJwt({
+          id: user.id,
+          roleId: user.roleId,
+          email: user.email,
+          type: user.type
+        })
+
+        delete user?.password
+        delete user?.createdBy
+        delete user?.updatedBy
+        delete user?.isDeleted
+        delete user?.deletedBy
+        delete user?.deletedAt
+        delete user?.createdAt
+        delete user?.updatedAt
+        // res.cookie('token', jwt, { secure: true, httpOnly: true })
+        res.generalResponse("Login Successful", { ...user, token: jwt });
+      }
+    }
+
+  })
+
+  static revieweroperatorLogin = asyncHandler(async (req: Request, res: Response) => {
+    
+    const { email, password } = req.body;
+    // console.log("req.body", req.body)
+    const user = await UserRepository.findUserByEmail(email);
+    // console.log("user", user)
+
+    if (!user || user === null) {
+      res.generalError("Username or password is not valid!", {}, 404);
+    } else if (user['Role.type'] === 'ADMIN') {
+      res.generalError("You are not allowed to access this resource", {}, 401)
+    } else {
+      const isCorrectPass = await PasswordManagerClass.comparePassword(user.password, password)
+      console.log("isCorrectPass", isCorrectPass)
+      if (!isCorrectPass) {
+        res.generalError("Username or password is invalid", {}, 401)
+      } else {
+        const jwt = AuthMiddleware.createJwt({
+          id: user.id,
+          roleId: user.roleId,
+          name: user.name,
+          email: user.email,
+          type: user.type
+        })
+
+        delete user?.password
+        delete user?.createdBy
+        delete user?.updatedBy
+        delete user?.isDeleted
+        delete user?.deletedBy
+        delete user?.deletedAt
+        delete user?.createdAt
+        delete user?.updatedAt
+        // res.cookie('token', jwt, { secure: true, httpOnly: true })
+        res.generalResponse("Login Successful", { ...user, token: jwt });
+      }
+    }
+
+  })
+
+  static logout = asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const expiredToken = AuthMiddleware.createJwt({}, "short")
+      res.clearCookie('jwt');
+      res.cookie('jwt', expiredToken, { httpOnly: true, secure: true });
+      res.json({ message: 'Logout successful' });
+    } catch (error: any) {
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  })
+
+
+  static adminRegister = asyncHandler(async (req: Request, res: Response) => {
+
+    const dto = new RegisterDTO();
+    dto.name = req.body.name;
+    dto.cnic = req.body.cnic;
+    dto.email = req.body.email;
+    dto.govtID = req.body.govtID;
+    dto.designation = req.body.designation;
+    dto.deptID = req.body.deptID;
+    dto.dptIdDoc = req.body.dptIdDoc;
+    dto.password = req.body.password;
+    let roleId: number;
+    if (req.body.designation === 'OPERATOR') {
+      roleId = 2;
+    } else if (req.body.designation === 'REVIEWER') {
+      roleId = 3;
+    } else {
+      throw new ErrorResponse('Invalid designation');
+    }
+    const otherData = {
+      type: 'OPERATOR_REVIEWER',
+      roleId
+    }
+
+    const isUserExist = await UserRepository.findUserByEmail(dto.email);
+    if (!isUserExist) {
+      const pass = await PasswordManagerClass.encryptPassword(dto.password);
+      const data = { ...dto, ...otherData, password: pass };
+      const createdUser = await UserRepository.createUser(data);
+      // Prepare response with only the required fields
+      const responseData = {
+        id: createdUser.id,
+        name: createdUser.name,
+        cnic: createdUser.cnic,
+        email: createdUser.email,
+        govtID: createdUser.govtID,
+        designation: createdUser.designation,
+        deptID: createdUser.deptID,
+        dptIdDoc: createdUser.dptIdDoc,
+        status: createdUser.status,
+      };
+      await emailService.sendTemplateMail(responseData.email, emailTemplates?.welcome?.subject, emailTemplates?.welcome?.template, { name: responseData.name });
+      res.generalResponse("User registered Successfully", responseData);
+    } else {
+      res.generalResponse("User already registered", isUserExist);
+    }
+  })
+
+  static vistorRegister = asyncHandler(async (req: Request, res: Response) => {
+
+    let data = req.body
+
+    const isUserExist = await UserRepository.findUserByEmail(data['email']);
+
+    if (!isUserExist) {
+      const role = await RoleRepository.getRoleById(data.roleId)
+
+      if (role?.dataValues?.type !== 'VISITOR') {
+        throw new ErrorResponse('Role Id is not correct')
+      }
+
+      const pass = await PasswordManagerClass.encryptPassword(req.body.password)
+      data = { ...req.body, password: pass }
+
+      var createdUser = await UserRepository.createUser(data);
+      let authToken = AuthMiddleware.createJwt({
+        id: data.id,
+        roleId: data.roleId,
+        email: data.email
+      });
+
+      delete data?.password
+
+      res.generalResponse("User registered Successfully", { ...data, token: authToken });
+    } else {
+
+      res.generalResponse("User already registered", createdUser);
+    }
+  })
+
+  static forgotPassword = asyncHandler(async (req: Request, res: Response) => {
+    console.log("Forgot call")
+    const { email } = req.body;
+    // Take email
+    // Verify OTP
+    // change password
+
+
+    // const isUserExist = await UserRepository.findUserByEmail(email);
+    // if (!isUserExist) {
+    //   res.generalError("User Not Found!", null , 404);
+    // } 
+
+    // OTP SERVICE
+    const createOtp = OTP.generateOTP();
+    const updateUser = await UserRepository.updateUserByEmail(email, parseInt(createOtp));
+
+    // EMAIL SERVICE        
+    res.generalResponse("please verify Otp:", updateUser);
+
+
+  });
+
+  static verifyOtp = asyncHandler(async (req: Request, res: Response) => {
+
+    const { email, otp } = req.body;
+    const expiryDate = new Date().getMinutes() + 10;
+    const record = await UserRepository.getOtp(email);
+    // const
+    // if (condition) {
+
+    // }
+    res.generalResponse("otp", record);
+
+  });
+
+  static changePassword = asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+
+      const isUserExist = await UserRepository.findUserByEmail(email);
+      if (!isUserExist) {
+        res.generalError("User Not Found!", null, 404);
+      } else {
+        const userUpdated = UserRepository.updateUserByEmail(email, password);
+        res.generalResponse("otp", userUpdated);
+      }
+
+    } catch (error) {
+      res.generalError("Something went wrong!", null, 500)
+    }
+  })
+
+
+
+  static async updateProfile(req: Request, res: Response): Promise<void> {
+    try {
+      // Implement updateProfile functionality here
+    } catch (error: any) {
+      res.status(400).json({ message: `Error updating user profile: ${error.message}` });
+    }
+  }
+
+
+  //admin logics
+
+  static createUser = asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const pass = await PasswordManagerClass.encryptPassword("123456")
+
+      const result = await UserRepository.createUser({ ...req.body, password: pass, type: 'ADMIN', age: Number(req.body.age), branchId: Number(req.body.branchId) });
+      delete result?.dataValues?.password;
+      res.generalResponse('User created successfuly!', result)
+
+    } catch (err) {
+      console.log("err", err)
+    }
+  })
+
+  static deleteUser = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await UserRepository.deleteUser(Number(id));
+    res.generalResponse('User deleted successfuly!', {})
+  })
+
+  static updateUser = asyncHandler(async (req: Request, res: Response) => {
+    const result = await UserRepository.updateUser(req.body.id, req.body.data);
+    res.generalResponse('User updated successfuly!', result)
+  })
+
+  static getUserById = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await UserRepository.getUserById(Number(id));
+    res.generalResponse('Data fetched successfuly!', result)
+  })
+
+  static getUser = asyncHandler(async (req: Request, res: Response) => {
+    if(req.user.type !== 'ADMIN') {
+      return res.generalError("You are not allowed to access this resource", {}, 401);
+    }
+    const result = await UserRepository.getUsersWithoutAdmin(req.query);
+    const updatedResult = {
+      records: result.records
+        .filter((user: any) => user.type !== "ADMIN")
+        .map((user: any) => {
+          return {
+            id: user.id,
+            name: user.name,
+            cnic: user.cnic,
+            email: user.email,
+            govtID: user.govtID,
+            designation: user.designation,
+            deptID: user.deptID,
+            dptIdDoc: user.dptIdDoc,
+            status: user.status,
+            roleId: user.roleId,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+          }
+        }),
+      currentPage: result.currentPage,
+      totalPages: result.totalPages,
+      totalRecords: result.totalRecords,
+    }
+    res.generalResponse('Users fetched successfuly!', updatedResult)
+  })
+
+  static getMyPermissions = asyncHandler(async (req: Request, res: Response) => {
+    const result = await UserRepository.getMyPermissions(req.user.roleId);
+    res.generalResponse("Data fetch successfuly!!", result);
+  })
+}
+
+export default UserService;

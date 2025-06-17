@@ -1,0 +1,19 @@
+npx sequelize-cli db:migrate --config ./config/config.js
+
+
+// to create migartion file
+npx sequelize-cli migration:generate --name create-users
+
+// run migrations
+npx sequelize-cli db:migrate
+
+// create seeders file
+npx sequelize-cli seed:generate --name demo-user
+
+
+// run seeders
+npx sequelize-cli db:seed:all
+
+// run only one file of seeders
+npx sequelize-cli db:seed --seed 20231023231305-roles.js
+
