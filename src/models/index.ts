@@ -16,17 +16,19 @@ import Permissions from "./Permissions";
 // import AttributeMediaFile from "./AttributeMediaFile";
 // import SubAttributeMediaFile from "./SubAttributeMediaFile";
 // import ItemMediaFile from "./ItemMediaFile";
-import UserTitles from "./UserTitles";
+// import UserTitles from "./UserTitles";
 // import ChecklistTitle from "./ChecklistTitles";
 // import Areas from "./Areas";
 // import Clusters from "./Clusters";
 // import Branches from "./Branches";
 import Notifications from "./Notifications";
 import AuditLogs from "./AuditLogs";
+
 // import ChecklistSchedules from "./ChecklistSchedules";
 // import CheckListAssign from "./ChecklistAssign";
 import Actions from './Action';
 import './relations/index';
+import Cases from "./Case";
 
 export {
   User,
@@ -47,7 +49,7 @@ export {
   // AttributeMediaFile,
   // SubAttributeMediaFile,
   // ItemMediaFile,
-  UserTitles,
+  // UserTitles,
   // ChecklistTitle,
   // Areas,
   // Clusters,
@@ -56,5 +58,6 @@ export {
   AuditLogs,
   // ChecklistSchedules,
   // CheckListAssign,
-  Actions
+  Actions,
+  Cases
 };

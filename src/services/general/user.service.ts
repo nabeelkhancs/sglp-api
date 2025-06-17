@@ -8,6 +8,7 @@ import RoleRepository from '../../repositories/rbac/roles.repository';
 import { ErrorResponse } from '../../middlewares/errorHandler';
 import RegisterDTO from '../../dto/classes/Register.dto';
 import emailService from './email.service';
+import CommonService from './common.service';
 const PasswordManagerClass = new PasswordManager();
 import emailTemplates from '../../lib/emailTemplates.json';
 
@@ -315,7 +316,16 @@ class UserService {
     if(req.user.type !== 'ADMIN') {
       return res.generalError("You are not allowed to access this resource", {}, 401);
     }
-    const result = await UserRepository.getUsersWithoutAdmin(req.query);
+    const status = req.query.status as string;
+    let query = { ...req.query };
+    if (status && status !== 'All') {
+      query = { ...query, status };
+    } else {
+      // Remove status if it's 'All' or not provided
+      delete query.status;
+    }
+    const result = await UserRepository.getUsersWithoutAdmin(query);
+    const actions = await CommonService.getPageActionsByRole(req?.user?.roleId, "User Registration");
     const updatedResult = {
       records: result.records
         .filter((user: any) => user.type !== "ADMIN")
@@ -338,6 +348,7 @@ class UserService {
       currentPage: result.currentPage,
       totalPages: result.totalPages,
       totalRecords: result.totalRecords,
+      actions
     }
     res.generalResponse('Users fetched successfuly!', updatedResult)
   })

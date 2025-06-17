@@ -3,6 +3,7 @@ import asyncHandler from '../../common/asyncHandler';
 import { ICases } from '../../models/interfaces';
 import CaseRepository from '../../repositories/general/CaseRepository';
 import PermissionsService from '../rbac/permissions.service';
+import CommonService from './common.service';
 
 class CaseService {
   static createCase = asyncHandler(async (req: Request, res: Response) => {
@@ -24,24 +25,9 @@ class CaseService {
     const pageNumber = parseInt(req.query.pageNumber as string) || 1;
     const pageSize = parseInt(req.query.pageSize as string) || 10;
     const result = await CaseRepository.getCases(pageNumber, pageSize);
-    const permissions = await PermissionsService.getPermissionsByRole(req?.user?.roleId);
-    const submittedCasePermission = permissions.find(
-      (perm: any) => perm.Page && perm.Page.label === "Submitted Case"
-    );
-
-    res.generalResponse("Cases fetched successfully!", {result, permissions: this.getSubmittedCaseActions(permissions)});
+    const actions = await CommonService.getPageActionsByRole(req?.user?.roleId, "Submitted Case");
+    res.generalResponse("Cases fetched successfully!", {result, actions});
   });
-
-  static getSubmittedCaseActions = (permissions: any[]) => {
-    const submittedCasePermission = permissions.find(
-      (perm: any) => perm.Page && perm.Page.label === "Submitted Case"
-    );
-    let actions: string[] = [];
-    if (submittedCasePermission && Array.isArray(submittedCasePermission.Permissions)) {
-      actions = submittedCasePermission.Permissions.map((p: any) => p.Action?.name).filter(Boolean);
-    }
-    return actions;
-  }
 
   static getCase = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
