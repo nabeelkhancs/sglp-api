@@ -28,6 +28,9 @@ export default class RegisterDTO {
   // @IsNotEmpty()
   @IsString()
   dptIdDoc!: string;
+ 
+  @IsString()
+  firstPageVisited!: string;
 
   @IsNotEmpty()
   @IsString()

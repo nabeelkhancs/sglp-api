@@ -25,7 +25,8 @@ class CaseService {
     const pageNumber = parseInt(req.query.pageNumber as string) || 1;
     const pageSize = parseInt(req.query.pageSize as string) || 10;
     const result = await CaseRepository.getCases(pageNumber, pageSize);
-    const actions = await CommonService.getPageActionsByRole(req?.user?.roleId, "Submitted Case");
+    const actions = await CommonService.getPageActionsByRole(req?.user?.roleId, req?.user?.roleId == 1 || 3 ? "Cases" : "Submitted Case");
+    console.log("actions", actions);
     res.generalResponse("Cases fetched successfully!", {result, actions});
   });
 
@@ -55,19 +56,19 @@ class CaseService {
       delete caseData.caseNumber;
     }
     
-    if (userType === 'REVIEWER') {
-      const allowedFields = ['court', 'region', 'relativeDepartment', 'caseStatus', 'isUrgent', 'isCallToAttention'];
-      const invalid = Object.keys(caseData).some(key => !allowedFields.includes(key));
-      if (invalid) {
-        return res.status(403).json({ error: 'you are not allowed to do this' });
-      }
-    }
+    // if (userType === 'REVIEWER') {
+    //   const allowedFields = ['court', 'region', 'relativeDepartment', 'caseStatus', 'isUrgent', 'isCallToAttention', 'isCsCalledInPerson'];
+    //   const invalid = Object.keys(caseData).some(key => !allowedFields.includes(key));
+    //   if (invalid) {
+    //     return res.status(403).json({ error: 'you are not allowed to do this' });
+    //   }
+    // }
     
-    if (userType === 'OPERATOR') {
-      if ('isUrgent' in caseData || 'isCallToAttention' in caseData) {
-        return res.status(403).json({ error: 'you are not allowed to do this' });
-      }
-    }
+    // if (userType === 'OPERATOR') {
+    //   if ('isUrgent' in caseData || 'isCallToAttention' in caseData || 'isCsCalledInPerson' in caseData) {
+    //     return res.status(403).json({ error: 'you are not allowed to do this' });
+    //   }
+    // }
     const updatedCase = await CaseRepository.updateCase(Number(id), caseData);
     if (!updatedCase) {
       return res.status(404).json({ error: 'Case not found' });

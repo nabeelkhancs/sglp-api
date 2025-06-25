@@ -132,6 +132,7 @@ export interface ICases {
   court: string;
   region: string;
   relativeDepartment: string;
+  subjectOfApplication: string;
   dateReceived: Date;
   dateOfHearing: Date | null;
   caseStatus: string;
@@ -144,4 +145,5 @@ export interface ICases {
   isDeleted?: boolean;
   deletedBy?: number | null;
   deletedAt?: Date | null;
+  isCsCalledInPerson?: boolean;
 }

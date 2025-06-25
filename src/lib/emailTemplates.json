@@ -1,7 +1,7 @@
 {
   "welcome": {
     "subject": "Welcome to SGLP!",
-    "template": "<p>Hello {{name}},</p><p>Thank you for registering at SGLP.</p>"
+    "template": "<p>Hello {{name}},</p><p>Thank you for registering at SGLP.</p><p>Please verify your email address by clicking <a href='{{verifyLink}}'>here</a>. This link will expire in 24 hours.</p>"
   },
   "passwordReset": {
     "subject": "Reset Your Password",
@@ -14,5 +14,9 @@
   "accountApproved": {
     "subject": "Account Approved",
     "template": "<p>Congratulations {{name}}, your account has been approved!</p>"
+  },
+  "verifyEmail": {
+    "subject": "Verify Your Email Address",
+    "template": "<p>Hello {{name}},</p><p>Please verify your email address by clicking <a href='{{verifyLink}}'>here</a>. This link will expire in 24 hours.</p>"
   }
 }

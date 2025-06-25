@@ -23,6 +23,10 @@ export default class CaseDTO {
   relativeDepartment!: string;
 
   @IsNotEmpty()
+  @IsString()
+  subjectOfApplication!: string;
+
+  @IsNotEmpty()
   @IsDateString()
   dateReceived!: Date;
 
@@ -45,6 +49,10 @@ export default class CaseDTO {
   @IsOptional()
   @IsBoolean()
   isCallToAttention!: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isCsCalledInPerson?: boolean;
 
   @IsOptional()
   @IsNumber()

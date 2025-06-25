@@ -14,5 +14,6 @@ router.post('/admin/auth/register', validateDTO(RegisterDTO), UserService.adminR
 router.post('/auth/login', UserService.revieweroperatorLogin)
 router.post('/auth/logout', UserService.logout)
 router.get('/', (req, res) => res.send("Welcome to SGLP API"));
+router.post('/verify-email', UserService.verifyEmail)
 
 export default router;

@@ -33,6 +33,10 @@ Cases.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    subjectOfApplication: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     dateReceived: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -58,6 +62,11 @@ Cases.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false,
+    },
+    isCsCalledInPerson: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: true,
     },
     createdBy: {
       type: DataTypes.INTEGER,

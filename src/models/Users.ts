@@ -70,7 +70,7 @@ User.init({
   isEmailVerify: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: true,
+    defaultValue: false,
   },
   createdBy: {
     type: DataTypes.INTEGER,

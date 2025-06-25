@@ -11,6 +11,7 @@ import emailService from './email.service';
 import CommonService from './common.service';
 const PasswordManagerClass = new PasswordManager();
 import emailTemplates from '../../lib/emailTemplates.json';
+import jwt from 'jsonwebtoken';
 
 class UserService {
 
@@ -149,6 +150,7 @@ class UserService {
     dto.password = req.body.password;
     let roleId: number;
     if (req.body.designation === 'OPERATOR') {
+      // dto.firstPageVisited = "/cases/submitted"
       roleId = 2;
     } else if (req.body.designation === 'REVIEWER') {
       roleId = 3;
@@ -177,8 +179,13 @@ class UserService {
         dptIdDoc: createdUser.dptIdDoc,
         status: createdUser.status,
       };
-      await emailService.sendTemplateMail(responseData.email, emailTemplates?.welcome?.subject, emailTemplates?.welcome?.template, { name: responseData.name });
+      
+      const verifyLink = `${process.env.EMAIL_VERIFICATION_URL}?token=${CommonService.generateEmailVerificationToken(createdUser.id, createdUser.email)}`;
+      
+      let email = await emailService.sendTemplateMail(responseData.email, emailTemplates?.welcome?.subject, emailTemplates?.welcome?.template, { name: responseData.name, verifyLink });
+      console.log("email", email)
       res.generalResponse("User registered Successfully", responseData);
+
     } else {
       res.generalResponse("User already registered", isUserExist);
     }
@@ -357,6 +364,38 @@ class UserService {
     const result = await UserRepository.getMyPermissions(req.user.roleId);
     res.generalResponse("Data fetch successfuly!!", result);
   })
+
+  static verifyEmail = asyncHandler(async (req: Request, res: Response) => {
+    const { token } = req.query;
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({ error: 'Token is required' });
+    }
+    try {
+      const secret = process.env.JWT_SECRET;
+      if (!secret) throw new Error('JWT_SECRET not defined');
+      const decoded: any = jwt.verify(token, secret);
+      if (decoded.type !== 'email_verification') {
+        return res.status(400).json({ error: 'Invalid token type' });
+      }
+      // Check if already verified
+      const user = await UserRepository.getUserById(decoded.userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      if (user.isEmailVerify) {
+        return res.status(400).json({ error: 'Email already verified' });
+      }
+      await UserRepository.updateUser(decoded.userId, { isEmailVerify: true });
+      // Optionally: store used tokens in DB or cache to prevent reuse
+      res.json({ message: 'Email verified successfully!' });
+    } catch (err: any) {
+      if (err.name === 'TokenExpiredError') {
+        return res.status(400).json({ error: 'Token expired' });
+      }
+      res.status(400).json({ error: 'Invalid or expired token' });
+    }
+  });
+
 }
 
 export default UserService;

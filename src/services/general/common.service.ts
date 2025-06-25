@@ -1,4 +1,5 @@
 import PermissionsService from '../rbac/permissions.service';
+import * as jwt from 'jsonwebtoken';
 
 class CommonService {
   static async getPageActionsByRole(roleId: number, pageLabel: string) {
@@ -11,6 +12,18 @@ class CommonService {
       actions = pagePermission.Permissions.map((p: any) => p.Action?.name).filter(Boolean);
     }
     return actions;
+  }
+
+  static generateEmailVerificationToken(userId: number, email: string): string {
+    // 24 hours expiry
+    const payload = {
+      userId,
+      email,
+      type: 'email_verification'
+    };
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new Error('JWT_SECRET not defined');
+    return jwt.sign(payload, secret, { expiresIn: '24h' });
   }
 }
 
