@@ -17,6 +17,7 @@ export interface UsersAttributes {
   password?: string;
   profilePic?: string | null;
   designation?: string | null;
+  roleType?: string | null;
   isActive?: boolean;
   isEmailVerify?: boolean;
   createdBy?: string | null;

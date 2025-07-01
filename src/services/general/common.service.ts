@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 import PermissionsService from '../rbac/permissions.service';
 import * as jwt from 'jsonwebtoken';
 
@@ -24,6 +25,19 @@ class CommonService {
     const secret = process.env.JWT_SECRET;
     if (!secret) throw new Error('JWT_SECRET not defined');
     return jwt.sign(payload, secret, { expiresIn: '24h' });
+  }
+
+  static uploadFiles(req: Request, res: Response) {
+    const files = req.files as Express.Multer.File[];
+
+    if (!files || files.length === 0) {
+      return res.status(400).json({ message: "No files uploaded" });
+    }
+
+    res.json({
+      message: `${files.length} file(s) uploaded successfully`,
+      files,
+    });
   }
 }
 

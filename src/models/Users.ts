@@ -46,9 +46,12 @@ User.init({
     type: DataTypes.STRING,
   },
   dptIdDoc: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
   },
   designation: {
+    type: DataTypes.STRING,
+  },
+  roleType: {
     type: DataTypes.ENUM('ADMIN', 'OPERATOR', 'REVIEWER'),
     allowNull: true
   },

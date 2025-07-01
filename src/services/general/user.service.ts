@@ -145,17 +145,18 @@ class UserService {
     dto.email = req.body.email;
     dto.govtID = req.body.govtID;
     dto.designation = req.body.designation;
+    dto.roleType = req.body.roleType;
     dto.deptID = req.body.deptID;
     dto.dptIdDoc = req.body.dptIdDoc;
     dto.password = req.body.password;
     let roleId: number;
-    if (req.body.designation === 'OPERATOR') {
+    if (req.body.roleType === 'OPERATOR') {
       // dto.firstPageVisited = "/cases/submitted"
       roleId = 2;
-    } else if (req.body.designation === 'REVIEWER') {
+    } else if (req.body.roleType === 'REVIEWER') {
       roleId = 3;
     } else {
-      throw new ErrorResponse('Invalid designation');
+      throw new ErrorResponse('Invalid role type');
     }
     const otherData = {
       type: 'OPERATOR_REVIEWER',
@@ -175,6 +176,7 @@ class UserService {
         email: createdUser.email,
         govtID: createdUser.govtID,
         designation: createdUser.designation,
+        roleType: createdUser.roleType,
         deptID: createdUser.deptID,
         dptIdDoc: createdUser.dptIdDoc,
         status: createdUser.status,
@@ -361,6 +363,7 @@ class UserService {
   })
 
   static getMyPermissions = asyncHandler(async (req: Request, res: Response) => {
+    console.log("req.user", req.user)
     const result = await UserRepository.getMyPermissions(req.user.roleId);
     res.generalResponse("Data fetch successfuly!!", result);
   })
@@ -387,7 +390,7 @@ class UserService {
       }
       await UserRepository.updateUser(decoded.userId, { isEmailVerify: true });
       // Optionally: store used tokens in DB or cache to prevent reuse
-      res.json({ message: 'Email verified successfully!' });
+      res.generalResponse('Email verified successfully!', {});
     } catch (err: any) {
       if (err.name === 'TokenExpiredError') {
         return res.status(400).json({ error: 'Token expired' });
