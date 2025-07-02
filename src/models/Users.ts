@@ -46,7 +46,8 @@ User.init({
     type: DataTypes.STRING,
   },
   dptIdDoc: {
-    type: DataTypes.TEXT,
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    allowNull: true,
   },
   designation: {
     type: DataTypes.STRING,

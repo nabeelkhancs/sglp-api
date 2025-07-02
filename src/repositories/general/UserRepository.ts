@@ -80,6 +80,20 @@ class UserRepository {
       throw new Error(`Error finding user by email: ${error.message}`);
     }
   }
+  
+  static async findUserByKey(key: string, value: string): Promise<any> {
+    try {
+      const user = await User.findOne({
+        where: {
+          [key]: value,
+          isActive: true
+        },
+      });
+      return user;
+    } catch (error: any) {
+      throw new Error(`Error finding user by email: ${error.message}`);
+    }
+  }
 
   static async updateUserByEmail(email: string, data: any): Promise<any> {
     const user = await User.findOne({ where: { email } });

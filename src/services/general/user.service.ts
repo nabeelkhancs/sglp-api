@@ -86,7 +86,7 @@ class UserService {
   })
 
   static revieweroperatorLogin = asyncHandler(async (req: Request, res: Response) => {
-    
+
     const { email, password } = req.body;
     // console.log("req.body", req.body)
     const user = await UserRepository.findUserByEmail(email);
@@ -181,9 +181,9 @@ class UserService {
         dptIdDoc: createdUser.dptIdDoc,
         status: createdUser.status,
       };
-      
+
       const verifyLink = `${process.env.EMAIL_VERIFICATION_URL}?token=${CommonService.generateEmailVerificationToken(createdUser.id, createdUser.email)}`;
-      
+
       let email = await emailService.sendTemplateMail(responseData.email, emailTemplates?.welcome?.subject, emailTemplates?.welcome?.template, { name: responseData.name, verifyLink });
       console.log("email", email)
       res.generalResponse("User registered Successfully", responseData);
@@ -322,7 +322,7 @@ class UserService {
   })
 
   static getUser = asyncHandler(async (req: Request, res: Response) => {
-    if(req.user.type !== 'ADMIN') {
+    if (req.user.type !== 'ADMIN') {
       return res.generalError("You are not allowed to access this resource", {}, 401);
     }
     const status = req.query.status as string;
@@ -396,6 +396,42 @@ class UserService {
         return res.status(400).json({ error: 'Token expired' });
       }
       res.status(400).json({ error: 'Invalid or expired token' });
+    }
+  });
+
+  static verification = asyncHandler(async (req: Request, res: Response) => {
+    const { email, cnic, govtID } = req.body;
+    const errors: { type: string; message: string }[] = [];
+
+    try {
+      if (email) {
+        const userByEmail = await UserRepository.findUserByEmail(email);
+        if (userByEmail) {
+          errors.push({ type: 'email', message: 'Email already exists' });
+        }
+      }
+
+      if (cnic) {
+        const userByCnic = await UserRepository.findUserByKey("cnic", cnic);
+        if (userByCnic) {
+          errors.push({ type: 'cnic', message: 'CNIC already exists' });
+        }
+      }
+
+      if (govtID) {
+        const userByGovtID = await UserRepository.findUserByKey("govtID", govtID);
+        if (userByGovtID) {
+          errors.push({ type: 'govtID', message: 'Government ID already exists' });
+        }
+      }
+
+      if (errors.length > 0) {
+        return res.generalError('Validation failed', { errors }, 400);
+      }
+
+      return res.generalResponse('Verification successful');
+    } catch (error) {
+      return res.generalError('Something went wrong', { error }, 500);
     }
   });
 

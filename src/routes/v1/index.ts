@@ -39,6 +39,7 @@ router.post('/admin/auth/register', validateDTO(RegisterDTO), UserService.adminR
 router.post('/auth/login', UserService.revieweroperatorLogin);
 router.post('/auth/logout', UserService.logout);
 router.post('/verify-email', UserService.verifyEmail);
+router.post('/verification', UserService.verification);
 
 // General routes
 router.post('/uploads', upload.any(), CommonService.uploadFiles);
