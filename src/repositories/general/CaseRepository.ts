@@ -77,6 +77,7 @@ class CaseRepository {
                 offset: offset,
                 order: [['updatedAt', 'DESC']],
             });
+            console.log("Fetched cases:", rows);
             return { rows, count };
         } catch (error) {
             console.error("Error fetching cases:", error);

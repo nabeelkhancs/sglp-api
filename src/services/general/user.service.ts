@@ -363,7 +363,6 @@ class UserService {
   })
 
   static getMyPermissions = asyncHandler(async (req: Request, res: Response) => {
-    console.log("req.user", req.user)
     const result = await UserRepository.getMyPermissions(req.user.roleId);
     res.generalResponse("Data fetch successfuly!!", result);
   })

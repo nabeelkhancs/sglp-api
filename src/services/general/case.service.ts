@@ -12,13 +12,16 @@ class CaseService {
       createdBy: req.user.id,
     };
     const result: any = await CaseRepository.createCase({ ...caseData, ...otherCaseData });
-    const date = new Date();
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    const caseNumber = `CASE-${yyyy}${mm}${dd}-${String(result.id).padStart(4, '0')}`;
-    await CaseRepository.updateCase(result.id, { caseNumber });
-    res.generalResponse("Case created successfully!", { ...result.toJSON(), caseNumber });
+    if (!result.caseNumber || result.caseNumber === "") {
+      const date = new Date();
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const caseNumber = `CASE-${yyyy}${mm}${dd}-${String(result.id).padStart(4, '0')}`;
+      await CaseRepository.updateCase(result.id, { caseNumber });
+      result.caseNumber = caseNumber;
+    }
+    res.generalResponse("Case created successfully!", { ...result.toJSON() });
   });
 
   static getAllCases = asyncHandler(async (req: Request, res: Response) => {
@@ -27,7 +30,7 @@ class CaseService {
     const result = await CaseRepository.getCases(pageNumber, pageSize);
     const actions = await CommonService.getPageActionsByRole(req?.user?.roleId, req?.user?.roleId == 1 || 3 ? "Cases" : "Submitted Case");
     console.log("actions", actions);
-    res.generalResponse("Cases fetched successfully!", {result, actions});
+    res.generalResponse("Cases fetched successfully!", { result, actions });
   });
 
   static getCase = asyncHandler(async (req: Request, res: Response) => {
@@ -51,11 +54,11 @@ class CaseService {
     if (!id) {
       return res.status(400).json({ error: 'Please provide id as a route parameter' });
     }
-    
+
     if ('caseNumber' in caseData) {
       delete caseData.caseNumber;
     }
-    
+
     // if (userType === 'REVIEWER') {
     //   const allowedFields = ['court', 'region', 'relativeDepartment', 'caseStatus', 'isUrgent', 'isCallToAttention', 'isCsCalledInPerson'];
     //   const invalid = Object.keys(caseData).some(key => !allowedFields.includes(key));
@@ -63,7 +66,7 @@ class CaseService {
     //     return res.status(403).json({ error: 'you are not allowed to do this' });
     //   }
     // }
-    
+
     // if (userType === 'OPERATOR') {
     //   if ('isUrgent' in caseData || 'isCallToAttention' in caseData || 'isCsCalledInPerson' in caseData) {
     //     return res.status(403).json({ error: 'you are not allowed to do this' });

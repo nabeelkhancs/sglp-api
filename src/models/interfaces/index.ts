@@ -147,4 +147,6 @@ export interface ICases {
   deletedBy?: number | null;
   deletedAt?: Date | null;
   isCsCalledInPerson?: boolean;
+  cpNumber: string;
+  caseType?: string;
 }

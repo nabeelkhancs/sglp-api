@@ -30,7 +30,7 @@ Cases.init(
       allowNull: false,
     },
     relativeDepartment: {
-      type: DataTypes.STRING,
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
     },
     subjectOfApplication: {
@@ -46,11 +46,11 @@ Cases.init(
       allowNull: true,
     },
     caseStatus: {
-      type: DataTypes.STRING,
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
     },
     caseRemarks: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     isUrgent: {
@@ -78,7 +78,8 @@ Cases.init(
     },
     isDeleted: {
       type: DataTypes.BOOLEAN,
-      allowNull: true,
+      allowNull: false,
+      defaultValue: false,
     },
     deletedBy: {
       type: DataTypes.INTEGER,
@@ -92,17 +93,25 @@ Cases.init(
       type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
     },
+    cpNumber: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    caseType: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
 
   {
     sequelize,
     tableName: 'cases',
-    // indexes: [
-    //   {
-    //     unique: true,
-    //     fields: [''],
-    //   }
-    // ]
+    indexes: [
+      {
+        unique: true,
+        fields: ['cpNumber'],
+      }
+    ]
   }
 );
 

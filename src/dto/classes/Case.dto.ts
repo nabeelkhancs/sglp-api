@@ -19,8 +19,8 @@ export default class CaseDTO {
   region!: string;
 
   @IsNotEmpty()
-  @IsString()
-  relativeDepartment!: string;
+  @IsString({ each: true })
+  relativeDepartment!: string[];
 
   @IsNotEmpty()
   @IsString()
@@ -35,8 +35,8 @@ export default class CaseDTO {
   dateOfHearing!: Date | null;
 
   @IsNotEmpty()
-  @IsString()
-  caseStatus!: string;
+  @IsString({ each: true })
+  caseStatus!: string[];
 
   @IsNotEmpty()
   @IsString()
@@ -78,4 +78,13 @@ export default class CaseDTO {
   @IsArray()
   @IsString({ each: true })
   uploadedFiles?: string[];
+
+  @IsNotEmpty()
+  @IsString()
+  cpNumber!: string;
+
+  @IsOptional()
+  @IsString()
+  caseType?: string;
+
 }
