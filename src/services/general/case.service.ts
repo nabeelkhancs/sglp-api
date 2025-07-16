@@ -25,11 +25,18 @@ class CaseService {
   });
 
   static getAllCases = asyncHandler(async (req: Request, res: Response) => {
-    const pageNumber = parseInt(req.query.pageNumber as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 10;
-    const result = await CaseRepository.getCases(pageNumber, pageSize);
-    const actions = await CommonService.getPageActionsByRole(req?.user?.roleId, req?.user?.roleId == 1 || 3 ? "Cases" : "Submitted Case");
-    console.log("actions", actions);
+    const { pageNumber, pageSize, ...filters } = req.query;
+
+    const page = pageNumber ? parseInt(pageNumber as string) : 1;
+    const size = pageSize ? parseInt(pageSize as string) : 10;
+
+    const result = await CaseRepository.getCases(page, size, filters);
+
+    const actions = await CommonService.getPageActionsByRole(
+      req?.user?.roleId,
+      req?.user?.roleId == 1 || req?.user?.roleId == 3 ? "Cases" : "Submitted Case"
+    );
+
     res.generalResponse("Cases fetched successfully!", { result, actions });
   });
 

@@ -68,11 +68,14 @@ class CaseRepository {
         }
     }
 
-    static async getCases(pageNumber: number = 1, pageSize: number = 10): Promise<{ rows: Cases[]; count: number }> {
+    static async getCases(pageNumber: number = 1, pageSize: number = 10, filters = {}): Promise<{ rows: Cases[]; count: number }> {
         try {
             const offset = (pageNumber - 1) * pageSize;
             const { count, rows } = await Cases.findAndCountAll({
-                where: { isDeleted: false },
+                where: { 
+                    ...filters,
+                    isDeleted: false 
+                },
                 limit: pageSize,
                 offset: offset,
                 order: [['updatedAt', 'DESC']],
