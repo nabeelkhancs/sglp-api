@@ -79,7 +79,7 @@ class CaseService {
     //     return res.status(403).json({ error: 'you are not allowed to do this' });
     //   }
     // }
-    const updatedCase = await CaseRepository.updateCase(Number(id), caseData);
+    const updatedCase = await CaseRepository.updateCase(Number(id), { ...caseData, updatedBy: req.user.id });
     if (!updatedCase) {
       return res.status(404).json({ error: 'Case not found' });
     }

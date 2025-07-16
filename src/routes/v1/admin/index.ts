@@ -7,7 +7,7 @@ import generalRoute from "./general";
 import authRoute from "./auth";
 import userRoute from "./user";
 import caseRoutes from "./case";
-// import clusterRoutes from "./cluster";
+import committeeRoutes from "./committee";
 // import areaRoutes from "./area";
 // import branchRoutes from "./branch";
 import AuthMiddleware from "../../../auth/jwt";
@@ -23,6 +23,7 @@ router.use("/actions", AuthMiddleware.auth, actionRoute)
 router.use("/", AuthMiddleware.auth, generalRoute)
 router.use("/users", AuthMiddleware.auth, userRoute)
 router.use("/cases", AuthMiddleware.auth,  caseRoutes)
+router.use("/committees", AuthMiddleware.auth,  committeeRoutes)
 // router.use('/cluster', AuthMiddleware.auth, clusterRoutes)
 // router.use('/area', AuthMiddleware.auth, areaRoutes)
 // router.use('/branch', AuthMiddleware.auth, branchRoutes)

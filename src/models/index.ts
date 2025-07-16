@@ -29,6 +29,7 @@ import AuditLogs from "./AuditLogs";
 import Actions from './Action';
 import './relations/index';
 import Cases from "./Case";
+import Committee from "./Committee";
 
 export {
   User,
@@ -59,5 +60,6 @@ export {
   // ChecklistSchedules,
   // CheckListAssign,
   Actions,
-  Cases
+  Cases,
+  Committee
 };

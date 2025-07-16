@@ -79,6 +79,10 @@ export default class CaseDTO {
   @IsString({ each: true })
   uploadedFiles?: string[];
 
+  @IsOptional()
+  @IsString()
+  committeeApprovalFile?: string;
+
   @IsNotEmpty()
   @IsString()
   cpNumber!: string;

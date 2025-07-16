@@ -142,6 +142,7 @@ export interface ICases {
   isCallToAttention: boolean;
   createdBy: number | null;
   uploadedFiles?: string[]; // Array of strings for uploaded files
+  committeeApprovalFile?: string;
   updatedBy: number | null;
   isDeleted?: boolean;
   deletedBy?: number | null;
@@ -149,4 +150,19 @@ export interface ICases {
   isCsCalledInPerson?: boolean;
   cpNumber: string;
   caseType?: string;
+}
+export interface ICommittee {
+  id?: number;
+  cpNumber: string;
+  court: string;
+  compositionHeadedBy: string;
+  tors: string;
+  report: string;
+  status: string;
+  uploadedFiles?: string[];
+  createdBy?: number;
+  updatedBy?: number;
+  isDeleted?: boolean;
+  deletedBy?: number;
+  deletedAt?: Date;
 }

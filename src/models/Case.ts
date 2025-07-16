@@ -93,6 +93,10 @@ Cases.init(
       type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
     },
+    committeeApprovalFile: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     cpNumber: {
       type: DataTypes.STRING,
       allowNull: false
