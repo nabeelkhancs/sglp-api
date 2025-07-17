@@ -29,6 +29,7 @@ class CaseRepository {
     static async updateCase(id: number, caseData: Partial<ICases>): Promise<Cases | null> {
         try {
             const caseRecord = await Cases.findByPk(id);
+            
             if (!caseRecord) {
                 throw new Error("Case not found");
             }
@@ -80,7 +81,6 @@ class CaseRepository {
                 offset: offset,
                 order: [['updatedAt', 'DESC']],
             });
-            console.log("Fetched cases:", rows);
             return { rows, count };
         } catch (error) {
             console.error("Error fetching cases:", error);

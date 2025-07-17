@@ -79,6 +79,8 @@ export interface IRoles {
 export interface IAuditLogs {
   id?: number;
   action: string;
+  cpNumber?: string;
+  payload: string;
   userId: number
   isDeleted: boolean | null
   createdBy: string | null;

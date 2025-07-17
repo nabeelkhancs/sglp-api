@@ -20,15 +20,6 @@ AuditLogs.init({
     allowNull: true
   },
 
-  // branchId: {
-  //   type: DataTypes.INTEGER,
-  //   allowNull: true,
-  //   references: {
-  //     model: 'branches',
-  //     key: 'id'
-  //   }
-  // },
-  
   userId: {
     type: DataTypes.INTEGER,
     allowNull: true,
@@ -38,14 +29,14 @@ AuditLogs.init({
     }
   },
 
-  // checkListId: {
-  //   type: DataTypes.INTEGER,
-  //   allowNull: true,
-  //   references: {
-  //     model: 'branches',
-  //     key: 'id'
-  //   }
-  // },
+  cpNumber: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  payload: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
 
 
   createdBy: {

@@ -3,6 +3,7 @@ import asyncHandler from '../../common/asyncHandler';
 import { ICommittee } from '../../models/interfaces';
 import CommitteeRepository from '../../repositories/general/CommitteeRepository';
 import CommonService from './common.service';
+import AuditLogsRepository from '../../repositories/general/AuditLogsRepository';
 
 class CommitteeService {
   static create = asyncHandler(async (req: Request, res: Response) => {
@@ -11,6 +12,7 @@ class CommitteeService {
       createdBy: req.user.id,
     };
     const result: any = await CommitteeRepository.createCommittee({ ...committeeData, ...otherCommitteeData });
+    await AuditLogsRepository.logAction(req.body, req, result.cpNumber || result.id, 'CREATE COMMITTEE');
     res.generalResponse("Committee created successfully!", { ...result.toJSON() });
   });
 
@@ -56,10 +58,11 @@ class CommitteeService {
       delete committeeData.cpNumber;
     }
 
-    const updatedCommittee = await CommitteeRepository.updateCommittee(Number(id), committeeData);
+    const updatedCommittee: any = await CommitteeRepository.updateCommittee(Number(id), committeeData);
     if (!updatedCommittee) {
       return res.status(404).json({ error: 'Committee not found' });
     }
+    await AuditLogsRepository.logAction(req.body, req, updatedCommittee.cpNumber || updatedCommittee.id, 'UPDATE COMMITTEE');
     res.generalResponse('Committee updated successfully!', updatedCommittee);
   });
 
