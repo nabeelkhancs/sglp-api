@@ -11,6 +11,7 @@ import committeeRoutes from "./committee";
 // import areaRoutes from "./area";
 // import branchRoutes from "./branch";
 import AuthMiddleware from "../../../auth/jwt";
+import CommonService from "../../../services/general/common.service";
 
 
 const router: Router = express.Router();
@@ -24,6 +25,10 @@ router.use("/", AuthMiddleware.auth, generalRoute)
 router.use("/users", AuthMiddleware.auth, userRoute)
 router.use("/cases", AuthMiddleware.auth,  caseRoutes)
 router.use("/committees", AuthMiddleware.auth,  committeeRoutes)
+router.use("/dashboard", AuthMiddleware.auth,  async (req, res) => {
+    const cases = await CommonService.getDashboardCases();
+    res.generalResponse('Dashboard cases fetched successfully!', cases);
+})
 // router.use('/cluster', AuthMiddleware.auth, clusterRoutes)
 // router.use('/area', AuthMiddleware.auth, areaRoutes)
 // router.use('/branch', AuthMiddleware.auth, branchRoutes)

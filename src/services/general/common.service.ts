@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import PermissionsService from '../rbac/permissions.service';
 import * as jwt from 'jsonwebtoken';
+import CaseRepository from '../../repositories/general/CaseRepository';
 
 class CommonService {
   static async getPageActionsByRole(roleId: number, pageLabel: string) {
@@ -38,6 +39,10 @@ class CommonService {
       message: `${files.length} file(s) uploaded successfully`,
       files,
     });
+  }
+
+  static async getDashboardCases() {
+    return await CaseRepository.getDashboardCases();
   }
 }
 

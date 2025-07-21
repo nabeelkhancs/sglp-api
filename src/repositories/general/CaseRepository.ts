@@ -99,6 +99,27 @@ class CaseRepository {
             throw new Error("Could not fetch case by number");
         }
     }
+
+    static async getDashboardCases() {
+        try {
+            const cases = await Cases.findAll({
+                attributes: [
+                    'subjectOfApplication',
+                    'caseStatus',
+                    'court',
+                    'region',
+                    'createdAt',
+                    'dateOfHearing'
+                ],
+                where: { isDeleted: false },
+                order: [['createdAt', 'DESC']]
+            });
+            return cases;
+        } catch (error) {
+            console.error('Error fetching dashboard cases:', error);
+            throw new Error('Could not fetch dashboard cases');
+        }
+    }
 }
 
 export default CaseRepository;
