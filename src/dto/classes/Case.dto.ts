@@ -92,3 +92,13 @@ export default class CaseDTO {
   caseType?: string;
 
 }
+
+export class DashboardCaseDTO {
+  @IsNotEmpty()
+  @IsString()
+  cpNumber!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  caseTitle!: string;
+}
