@@ -4,7 +4,6 @@ import { ICases } from '../../models/interfaces';
 import CaseRepository from '../../repositories/general/CaseRepository';
 import PermissionsService from '../rbac/permissions.service';
 import CommonService from './common.service';
-import AuditLogsRepository from '../../repositories/general/AuditLogsRepository';
 
 class CaseService {
   static createCase = asyncHandler(async (req: Request, res: Response) => {
@@ -22,15 +21,22 @@ class CaseService {
       await CaseRepository.updateCase(result.id, { caseNumber });
       result.caseNumber = caseNumber;
     }
-    await AuditLogsRepository.logAction(req.body, req, (result as ICases).cpNumber || (result as ICases).caseNumber, 'CREATE CASE');
     res.generalResponse("Case created successfully!", { ...result.toJSON() });
   });
 
   static getAllCases = asyncHandler(async (req: Request, res: Response) => {
-    const { pageNumber, pageSize, ...filters } = req.query;
+    const { pageNumber, pageSize, courts, subjectOfApplication, ...filters } = req.query;
 
     const page = pageNumber ? parseInt(pageNumber as string) : 1;
     const size = pageSize ? parseInt(pageSize as string) : 10;
+
+    // Handle courts and subjectOfApplication filters
+    if (courts) {
+      filters.court = courts;
+    }
+    if (subjectOfApplication) {
+      filters.subjectOfApplication = subjectOfApplication;
+    }
 
     const result = await CaseRepository.getCases(page, size, filters);
 
@@ -81,11 +87,10 @@ class CaseService {
     //     return res.status(403).json({ error: 'you are not allowed to do this' });
     //   }
     // }
-    const updatedCase: any = await CaseRepository.updateCase(Number(id), { ...caseData, updatedBy: req.user.id });
+    const updatedCase = await CaseRepository.updateCase(Number(id), caseData);
     if (!updatedCase) {
       return res.status(404).json({ error: 'Case not found' });
     }
-    await AuditLogsRepository.logAction(req.body, req, (updatedCase as ICases).cpNumber || (updatedCase as ICases).caseNumber, 'UPDATE');
     res.generalResponse('Case updated successfully!', updatedCase);
   });
 
