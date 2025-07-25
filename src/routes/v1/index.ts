@@ -6,6 +6,7 @@ import validateDTO from '../../dto/middlewares';
 import RegisterDTO from '../../dto/classes/Register.dto';
 import multer, { FileFilterCallback } from "multer";
 import CommonService from '../../services/general/common.service';
+import path from 'path';
 
 const router: Router = express.Router();
 
@@ -42,7 +43,22 @@ router.post('/verify-email', UserService.verifyEmail);
 router.post('/verification', UserService.verification);
 
 // General routes
-router.post('/uploads', upload.any(), CommonService.uploadFiles);
 router.get('/', (_req: Request, res: Response) => res.send("Welcome to SGLP API"));
+
+router.post('/uploads', upload.any(), CommonService.uploadFiles);
+
+router.get('/download', (req: Request, res: Response) => {
+  const { filename } = req.query;
+  if (!filename || typeof filename !== 'string') {
+    return res.status(400).json({ error: 'Filename is required' });
+  }
+  const filePath = path.resolve(process.cwd(), 'uploads', filename);
+  res.sendFile(filePath, err => {
+    if (err) {
+      res.status(404).json({ error: 'File not found' });
+    }
+  });
+});
+
 
 export default router;
