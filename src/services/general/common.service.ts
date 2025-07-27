@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import PermissionsService from '../rbac/permissions.service';
 import * as jwt from 'jsonwebtoken';
 import CaseRepository from '../../repositories/general/CaseRepository';
+import CommitteeRepository from '../../repositories/general/CommitteeRepository';
 
 class CommonService {
   static async getPageActionsByRole(roleId: number, pageLabel: string) {
@@ -41,8 +42,10 @@ class CommonService {
     });
   }
 
-  static async getDashboardCases() {
-    return await CaseRepository.getDashboardCases();
+  static async getDashboardCases(req: Request, res: Response) {
+    const cases = await CaseRepository.getDashboardCases();
+    const committees = await CommitteeRepository.getCommittees();
+    res.generalResponse('Dashboard cases fetched successfully!', { cases, committees: committees?.rows });
   }
 }
 

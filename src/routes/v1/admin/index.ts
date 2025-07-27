@@ -25,10 +25,7 @@ router.use("/", AuthMiddleware.auth, generalRoute)
 router.use("/users", AuthMiddleware.auth, userRoute)
 router.use("/cases", AuthMiddleware.auth,  caseRoutes)
 router.use("/committees", AuthMiddleware.auth,  committeeRoutes)
-router.use("/dashboard", AuthMiddleware.auth,  async (req, res) => {
-    const cases = await CommonService.getDashboardCases();
-    res.generalResponse('Dashboard cases fetched successfully!', cases);
-})
+router.use("/dashboard", AuthMiddleware.auth, CommonService.getDashboardCases)
 // router.use('/cluster', AuthMiddleware.auth, clusterRoutes)
 // router.use('/area', AuthMiddleware.auth, areaRoutes)
 // router.use('/branch', AuthMiddleware.auth, branchRoutes)
