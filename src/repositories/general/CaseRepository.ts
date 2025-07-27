@@ -74,7 +74,6 @@ class CaseRepository {
         pageNumber: number = 1,
         pageSize: number = 10,
         filters = {},
-        caseStatus = undefined
     ): Promise<{ rows: Cases[]; count: number }> {
         try {
             const offset = (pageNumber - 1) * pageSize;

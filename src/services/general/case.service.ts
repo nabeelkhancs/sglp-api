@@ -38,7 +38,7 @@ class CaseService {
       filters.subjectOfApplication = subjectOfApplication;
     }
 
-    const result = await CaseRepository.getCases(page, size, filters, caseStatus);
+    const result = await CaseRepository.getCases(page, size, filters);
 
     const actions = await CommonService.getPageActionsByRole(
       req?.user?.roleId,
