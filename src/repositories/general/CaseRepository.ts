@@ -145,7 +145,7 @@ class CaseRepository {
                 groupFields = ['region'];
                 whereClause.court = 'districtCourts';
             }
-            else if (filters.court === "otherCourts") {
+            else if (filters.court === "othercourts") {
                 // Exclude supreme, high, and district courts
                 const excludeCourts = [
                     'supremeCourtOfPakistan',
