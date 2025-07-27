@@ -152,6 +152,7 @@ export interface ICases {
   isCsCalledInPerson?: boolean;
   cpNumber: string;
   caseType?: string;
+  registry?: string;
 }
 export interface ICommittee {
   id?: number;

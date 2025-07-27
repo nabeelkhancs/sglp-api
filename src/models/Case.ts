@@ -105,6 +105,10 @@ Cases.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    registry: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
 
   {

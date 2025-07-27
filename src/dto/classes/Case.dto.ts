@@ -91,6 +91,10 @@ export default class CaseDTO {
   @IsString()
   caseType?: string;
 
+  @IsOptional()
+  @IsString()
+  registry?: string;
+
 }
 
 export class DashboardCaseDTO {
