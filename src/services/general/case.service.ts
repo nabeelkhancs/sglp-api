@@ -25,11 +25,11 @@ class CaseService {
   });
 
   static getAllCases = asyncHandler(async (req: Request, res: Response) => {
-    const { pageNumber, pageSize, courts, subjectOfApplication, ...filters } = req.query;
+    const { pageNumber, pageSize, courts, subjectOfApplication,  ...filters } = req.query;
 
     const page = pageNumber ? parseInt(pageNumber as string) : 1;
     const size = pageSize ? parseInt(pageSize as string) : 10;
-
+    let caseStatus = filters.caseStatus || undefined;
     // Handle courts and subjectOfApplication filters
     if (courts) {
       filters.court = courts;
@@ -38,7 +38,7 @@ class CaseService {
       filters.subjectOfApplication = subjectOfApplication;
     }
 
-    const result = await CaseRepository.getCases(page, size, filters);
+    const result = await CaseRepository.getCases(page, size, filters, caseStatus);
 
     const actions = await CommonService.getPageActionsByRole(
       req?.user?.roleId,

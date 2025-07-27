@@ -70,14 +70,28 @@ class CaseRepository {
         }
     }
 
-    static async getCases(pageNumber: number = 1, pageSize: number = 10, filters = {}): Promise<{ rows: Cases[]; count: number }> {
+    static async getCases(
+        pageNumber: number = 1,
+        pageSize: number = 10,
+        filters = {},
+        caseStatus = undefined
+    ): Promise<{ rows: Cases[]; count: number }> {
         try {
             const offset = (pageNumber - 1) * pageSize;
+            const whereFilters: any = { ...filters, isDeleted: false };
+
+            if ('caseStatus' in filters && filters.caseStatus !== undefined) {
+                if (typeof filters.caseStatus === 'string' && filters.caseStatus.trim() !== '') {
+                    whereFilters.caseStatus = { [Op.contains]: [filters.caseStatus] };
+                } else if (Array.isArray(filters.caseStatus)) {
+                    whereFilters.caseStatus = { [Op.contains]: filters.caseStatus };
+                } else {
+                    delete whereFilters.caseStatus;
+                }
+            }
+            console.log("Where Filters:", whereFilters);
             const { count, rows } = await Cases.findAndCountAll({
-                where: {
-                    ...filters,
-                    isDeleted: false
-                },
+                where: whereFilters,
                 limit: pageSize,
                 offset: offset,
                 order: [['updatedAt', 'DESC']],
