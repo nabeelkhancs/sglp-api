@@ -94,9 +94,16 @@ class CaseService {
     res.generalResponse('Case updated successfully!', updatedCase);
   });
 
+  static getCourtsCount = asyncHandler(async (req: Request, res: Response) => {
+    const filters: any = req.query;
+    
+    const result = await CaseRepository.getCourtsCount(filters);
+    res.generalResponse('Courts count fetched successfully!', result);
+  });
+
   async deleteCase(id: string) {
     // Logic to delete a case
   }
 }
 
-export default CaseService
+export default CaseService;

@@ -1,4 +1,5 @@
 import Cases from "../../models/Case";
+import { Op } from "sequelize";
 import { ICases } from "../../models/interfaces";
 
 class CaseRepository {
@@ -29,7 +30,7 @@ class CaseRepository {
     static async updateCase(id: number, caseData: Partial<ICases>): Promise<Cases | null> {
         try {
             const caseRecord = await Cases.findByPk(id);
-            
+
             if (!caseRecord) {
                 throw new Error("Case not found");
             }
@@ -73,9 +74,9 @@ class CaseRepository {
         try {
             const offset = (pageNumber - 1) * pageSize;
             const { count, rows } = await Cases.findAndCountAll({
-                where: { 
+                where: {
                     ...filters,
-                    isDeleted: false 
+                    isDeleted: false
                 },
                 limit: pageSize,
                 offset: offset,
@@ -118,6 +119,62 @@ class CaseRepository {
         } catch (error) {
             console.error('Error fetching dashboard cases:', error);
             throw new Error('Could not fetch dashboard cases');
+        }
+    }
+
+    static async getCourtsCount(filters: any): Promise<any> {
+        try {
+            const whereClause: any = { isDeleted: false };
+
+            let groupFields = ['court'];
+
+            if (filters.court === "registry") {
+                groupFields = ['registry'];
+            }
+            else if (filters.court && filters.court.toLowerCase().includes("highcourt")) {
+                const highCourts = [
+                    'sindhHighCourtKarachi',
+                    'sindhHighCourtHyderabad',
+                    'sindhHighCourtSukkur',
+                    'sindhHighCourtLarkana',
+                    'sindhHighCourtMirpurkhas'
+                ];
+                whereClause.court = { [Op.in]: highCourts };
+            }
+            else if (filters.court === "districtcourt") {
+                groupFields = ['region'];
+                whereClause.court = 'districtCourts';
+            }
+            else if (filters.court === "otherCourts") {
+                // Exclude supreme, high, and district courts
+                const excludeCourts = [
+                    'supremeCourtOfPakistan',
+                    'sindhHighCourtKarachi',
+                    'sindhHighCourtHyderabad',
+                    'sindhHighCourtSukkur',
+                    'sindhHighCourtLarkana',
+                    'sindhHighCourtMirpurkhas',
+                    'districtCourts'
+                ];
+                whereClause.court = { [Op.notIn]: excludeCourts };
+            }
+            else if (filters.court && filters.court !== "registry") {
+                whereClause.court = filters.court;
+            }
+
+            const attributes = [
+                ...groupFields,
+                [Cases.sequelize!.fn('COUNT', Cases.sequelize!.col('id')), 'count'] as [any, string]
+            ];
+            const result = await Cases.findAll({
+                attributes,
+                where: whereClause,
+                group: groupFields,
+            });
+            return result;
+        } catch (error) {
+            console.error("Error fetching courts count:", error);
+            throw new Error("Could not fetch courts count");
         }
     }
 }
