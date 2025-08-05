@@ -48,7 +48,7 @@ AuditLogs.init({
     // }
   },
   updatedBy: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: true,
     // references: {
     //   model: 'users',
@@ -61,7 +61,7 @@ AuditLogs.init({
     defaultValue: false,
   },
   deletedBy: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: true,
     // references: {
     //   model: 'users',

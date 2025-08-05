@@ -20,3 +20,9 @@ Permissions.belongsTo(RolePages, { foreignKey: 'rolePageId' })
 Permissions.belongsTo(Actions, { foreignKey: 'actionId' })
 RolePages.hasMany(Permissions, { foreignKey: 'rolePageId' })
 
+import Notifications from '../Notifications';
+import AuditLogs from '../AuditLogs';
+
+// Notification belongs to AuditLog
+Notifications.belongsTo(AuditLogs, { foreignKey: 'auditLogId', as: 'auditLog' })
+

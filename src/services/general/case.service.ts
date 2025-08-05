@@ -4,7 +4,7 @@ import { ICases } from '../../models/interfaces';
 import CaseRepository from '../../repositories/general/CaseRepository';
 import PermissionsService from '../rbac/permissions.service';
 import CommonService from './common.service';
-
+import AuditLogsRepository from '../../repositories/general/AuditLogsRepository';
 class CaseService {
   static createCase = asyncHandler(async (req: Request, res: Response) => {
     const caseData: ICases = req.body;
@@ -21,6 +21,8 @@ class CaseService {
       await CaseRepository.updateCase(result.id, { caseNumber });
       result.caseNumber = caseNumber;
     }
+    // Log audit action for case creation
+    await AuditLogsRepository.logAction(result.toJSON(), req, result.cpNumber, 'CREATE_CASE');
     res.generalResponse("Case created successfully!", { ...result.toJSON() });
   });
 
@@ -87,10 +89,12 @@ class CaseService {
     //     return res.status(403).json({ error: 'you are not allowed to do this' });
     //   }
     // }
-    const updatedCase = await CaseRepository.updateCase(Number(id), caseData);
+    const updatedCase: any = await CaseRepository.updateCase(Number(id), caseData);
     if (!updatedCase) {
       return res.status(404).json({ error: 'Case not found' });
     }
+    // Log audit action for case update
+    await AuditLogsRepository.logAction(updatedCase.toJSON(), req, updatedCase.caseNumber, 'UPDATE_CASE');
     res.generalResponse('Case updated successfully!', updatedCase);
   });
 

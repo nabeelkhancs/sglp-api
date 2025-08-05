@@ -16,27 +16,7 @@ Notifications.init({
     type: DataTypes.STRING,
     allowNull: true
   },
-  sender: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
   to: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-  cc: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-  bcc: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-  success: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-  error: {
     type: DataTypes.STRING,
     allowNull: true
   },
