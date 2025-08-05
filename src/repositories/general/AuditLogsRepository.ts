@@ -1,11 +1,18 @@
 import AuditLogs from '../../models/AuditLogs';
 import { IAuditLogs } from '../../models/interfaces';
 import { Request } from 'express';
-
+import Notifications from '../../models/Notifications';
 class AuditLogsRepository {
   static async createLog(logData: Omit<IAuditLogs, 'id'>): Promise<AuditLogs> {
     try {
-      const log = await AuditLogs.create(logData);
+      const log: any = await AuditLogs.create(logData);
+      await Notifications.create({
+        type: log.action,
+        to: 'all',
+        auditLogId: log.id,
+        createdBy: log.createdBy ?? null,
+        updatedBy: log.updatedBy ?? null,
+      });
       return log;
     } catch (error) {
       console.error('Error creating audit log:', error);

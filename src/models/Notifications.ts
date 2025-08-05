@@ -6,6 +6,7 @@ const sequelize = SequelizeClass.getInstance().sequelize;
 class Notifications extends Model<INotifications> { }
 
 Notifications.init({
+
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -58,6 +59,19 @@ Notifications.init({
   },
   deletedAt: {
     type: DataTypes.DATE,
+  },
+  isRead: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
+  auditLogId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'auditLogs',
+      key: 'id',
+    },
   },
 }, {
   sequelize,

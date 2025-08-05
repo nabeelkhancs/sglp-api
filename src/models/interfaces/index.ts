@@ -91,18 +91,20 @@ export interface IAuditLogs {
 
 export interface INotifications {
   id?: number;
-  type: string;
-  sender: string;
-  to: string[];
-  cc: string[] | null;
-  bcc: string[] | null;
-  success: boolean;
-  error: object | null;
-  isDeleted: boolean
-  createdBy: string;
-  updatedBy: string;
-  deletedBy: string;
-  deletedAt: Date;
+  type?: string;
+  sender?: string;
+  to?: string | null;
+  cc?: string[] | null;
+  bcc?: string[] | null;
+  success?: boolean;
+  error?: object | null;
+  isDeleted?: boolean
+  isRead?: boolean;
+  auditLogId?: number | null;
+  createdBy?: string;
+  updatedBy?: string;
+  deletedBy?: string;
+  deletedAt?: Date;
 }
 
 export interface IRolePage {
