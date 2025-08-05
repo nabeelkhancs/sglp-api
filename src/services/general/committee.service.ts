@@ -12,7 +12,7 @@ class CommitteeService {
       createdBy: req.user.id,
     };
     const result: any = await CommitteeRepository.createCommittee({ ...committeeData, ...otherCommitteeData });
-    await AuditLogsRepository.logAction(req.body, req, result.cpNumber || result.id, 'CREATE COMMITTEE');
+    await AuditLogsRepository.logAction(req.body, req, result.cpNumber || result.id, 'CREATE_COMMITTEE');
     res.generalResponse("Committee created successfully!", { ...result.toJSON() });
   });
 
@@ -62,7 +62,7 @@ class CommitteeService {
     if (!updatedCommittee) {
       return res.status(404).json({ error: 'Committee not found' });
     }
-    await AuditLogsRepository.logAction(req.body, req, updatedCommittee.cpNumber || updatedCommittee.id, 'UPDATE COMMITTEE');
+    await AuditLogsRepository.logAction(req.body, req, updatedCommittee.cpNumber || updatedCommittee.id, 'UPDATE_COMMITTEE');
     res.generalResponse('Committee updated successfully!', updatedCommittee);
   });
 

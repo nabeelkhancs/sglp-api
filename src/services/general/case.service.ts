@@ -94,7 +94,7 @@ class CaseService {
       return res.status(404).json({ error: 'Case not found' });
     }
     // Log audit action for case update
-    await AuditLogsRepository.logAction(updatedCase.toJSON(), req, updatedCase.caseNumber, 'UPDATE_CASE');
+    await AuditLogsRepository.logAction(updatedCase.toJSON(), req, updatedCase.cpNumber, 'UPDATE_CASE');
     res.generalResponse('Case updated successfully!', updatedCase);
   });
 

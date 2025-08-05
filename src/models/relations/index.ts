@@ -25,4 +25,5 @@ import AuditLogs from '../AuditLogs';
 
 // Notification belongs to AuditLog
 Notifications.belongsTo(AuditLogs, { foreignKey: 'auditLogId', as: 'auditLog' })
+AuditLogs.belongsTo(User, { foreignKey: 'userId', as: 'user' })
 

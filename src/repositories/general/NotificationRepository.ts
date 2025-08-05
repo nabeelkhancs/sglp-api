@@ -1,6 +1,7 @@
 import Notifications from '../../models/Notifications';
 import AuditLogs from '../../models/AuditLogs';
 import Paginate from '../../common/paginate';
+import { User } from '../../models';
 
 class NotificationRepository {
   static async findAll(where: any, order: any = [], pageNumber: number = 1, pageSize: number = 10) {
@@ -11,7 +12,12 @@ class NotificationRepository {
         {
           model: AuditLogs,
           as: 'auditLog',
-        }
+          include: [{
+            model: User,
+            attributes: ['id', 'name', 'email'],
+            as: 'user'
+          }]
+        },
       ];
       
       const attributes = undefined; // Use all attributes
