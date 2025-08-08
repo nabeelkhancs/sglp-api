@@ -68,6 +68,20 @@ class NotificationRepository {
       throw error;
     }
   }
+
+  static async updateAllIsRead(userId: number) {
+    try {
+      const notifications = await Notifications.update(
+        { isRead: true },
+        { where: { to: String(userId), isDeleted: false } }
+      );
+      return notifications;
+    } catch (error) {
+      console.error('Error in NotificationRepository.updateAllIsRead:', error);
+      throw error;
+    }
+  }
+
 }
 
 export default NotificationRepository;
