@@ -22,8 +22,8 @@ class ReportRepository {
       
       // Check if caseStatus array contains specific statuses
       if (filters.statusesToCheck && filters.statusesToCheck.length > 0) {
-        query += ` AND "caseStatus" && :statusesToCheck`;
-        replacements.statusesToCheck = filters.statusesToCheck;
+        const statusArray = filters.statusesToCheck.map((status: string) => `'${status}'`).join(',');
+        query += ` AND "caseStatus"::text[] && ARRAY[${statusArray}]`;
       }
       
       // Date filters
