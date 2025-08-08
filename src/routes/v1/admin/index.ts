@@ -1,16 +1,17 @@
 import express, { Router } from "express";
-import moduleRoutes from "./module";
-import pageRoutes from "./page";
-import roleRoutes from "./role";
-import actionRoute from "./action";
-import generalRoute from "./general";
+
 import authRoute from "./auth";
 import userRoute from "./user";
 import caseRoutes from "./case";
+import pageRoutes from "./page";
+import roleRoutes from "./role";
+import actionRoute from "./action";
+import moduleRoutes from "./module";
+import generalRoute from "./general";
+import reportsRoutes from "./reports";
 import committeeRoutes from "./committee";
-import notificationsRoutes from "./notifications";
-// import branchRoutes from "./branch";
 import AuthMiddleware from "../../../auth/jwt";
+import notificationsRoutes from "./notifications";
 import CommonService from "../../../services/general/common.service";
 
 
@@ -27,8 +28,6 @@ router.use("/cases", AuthMiddleware.auth,  caseRoutes)
 router.use("/committees", AuthMiddleware.auth,  committeeRoutes)
 router.use("/dashboard", AuthMiddleware.auth, CommonService.getDashboardCases)
 router.use("/notifications", AuthMiddleware.auth, notificationsRoutes)
-// router.use('/cluster', AuthMiddleware.auth, clusterRoutes)
-// router.use('/area', AuthMiddleware.auth, areaRoutes)
-// router.use('/branch', AuthMiddleware.auth, branchRoutes)
+router.use("/reports", AuthMiddleware.auth, reportsRoutes)
 
 export default router;
