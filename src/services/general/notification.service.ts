@@ -34,13 +34,13 @@ class NotificationService {
   });
 
   static markMultipleAsRead = asyncHandler(async (req: Request, res: Response) => {
-    const { ids } = req.body;
-    if (!Array.isArray(ids) || ids.length === 0) {
-      return res.status(400).json({ success: false, message: 'Invalid IDs array' });
+    const { notificationIds } = req.body;
+    console.log("notificationIds", notificationIds)
+    if (!Array.isArray(notificationIds) || notificationIds.length === 0) {
+      return res.status(400).json({ success: false, message: 'Invalid notificationIds array' });
     }
-
     const notifications = await Promise.all(
-      ids.map(id => NotificationRepository.updateIsRead(id))
+      notificationIds.map(id => {console.log("id ======================>", id); return NotificationRepository.updateIsRead(Number(id))})
     );
 
     res.generalResponse('Notifications marked as read!', notifications);
