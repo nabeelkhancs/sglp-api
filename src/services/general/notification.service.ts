@@ -50,6 +50,14 @@ class NotificationService {
     const notif = await NotificationRepository.create(req.body);
     res.status(201).generalResponse('Notification created successfully!', notif);
   });
+
+  static getNotificationCount = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.id || null;
+    if (!userId) return res.status(400).json({ success: false, message: 'User ID is required' });
+    
+    const notificationCount = await NotificationRepository.getNotificationCountByCategory(String(userId));
+    res.generalResponse('Notification count fetched successfully!', notificationCount);
+  });
 }
 
 export default NotificationService;
