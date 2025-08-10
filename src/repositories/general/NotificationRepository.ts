@@ -81,7 +81,8 @@ class NotificationRepository {
             n.id as notification_id,
             n."isRead",
             c."caseStatus",
-            c."cpNumber"
+            c."cpNumber",
+            al.action
           FROM notifications n
           LEFT JOIN "auditLogs" al ON n."auditLogId" = al.id
           LEFT JOIN cases c ON al."cpNumber" = c."cpNumber"
@@ -95,6 +96,10 @@ class NotificationRepository {
           -- All cases count and IDs
           COUNT(*) FILTER (WHERE "isRead" = false AND "cpNumber" IS NOT NULL) as all_cases_unread_count,
           ARRAY_AGG(notification_id) FILTER (WHERE "isRead" = false AND "cpNumber" IS NOT NULL) as all_cases_unread_ids,
+          
+          -- Committee notifications (CREATE_COMMITTEE or UPDATE_COMMITTEE)
+          COUNT(*) FILTER (WHERE "isRead" = false AND (action = 'CREATE_COMMITTEE' OR action = 'UPDATE_COMMITTEE')) as committee_unread_count,
+          ARRAY_AGG(notification_id) FILTER (WHERE "isRead" = false AND (action = 'CREATE_COMMITTEE' OR action = 'UPDATE_COMMITTEE')) as committee_unread_ids,
           
           -- Direction cases
           COUNT(*) FILTER (WHERE "isRead" = false AND "caseStatus"::text[] && ARRAY['direction']) as direction_unread_count,
@@ -134,6 +139,10 @@ class NotificationRepository {
           allCases: {
             unreadCount: parseInt(data.all_cases_unread_count) || 0,
             unreadIds: data.all_cases_unread_ids ? data.all_cases_unread_ids.filter((id: any) => id !== null) : []
+          },
+          committee: {
+            unreadCount: parseInt(data.committee_unread_count) || 0,
+            unreadIds: data.committee_unread_ids ? data.committee_unread_ids.filter((id: any) => id !== null) : []
           },
           direction: {
             unreadCount: parseInt(data.direction_unread_count) || 0,
