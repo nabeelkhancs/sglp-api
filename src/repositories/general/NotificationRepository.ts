@@ -24,7 +24,18 @@ class NotificationRepository {
       
       const attributes = undefined; // Use all attributes
       
-      return await Paginate(Notifications, Number(pageNumber), Number(pageSize), where, include, attributes);
+      // Get paginated notifications
+      const paginatedResult = await Paginate(Notifications, Number(pageNumber), Number(pageSize), where, include, attributes);
+      
+      // Get total unread count for the user
+      const unreadWhere = { ...where, isRead: false };
+      const totalUnreadCount = await Notifications.count({ where: unreadWhere });
+      
+      // Add unread count to the result
+      return {
+        ...paginatedResult,
+        totalUnreadCount
+      };
     } catch (error) {
       console.error('Error in NotificationRepository.findAll:', error);
       throw error;
