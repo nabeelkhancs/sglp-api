@@ -47,6 +47,7 @@ router.post('/verification', UserService.verification);
 router.get('/', (_req: Request, res: Response) => res.send("Welcome to SGLP API"));
 
 router.post('/uploads', upload.any(), CommonService.uploadFiles);
+router.post('/uploads/details', AuthMiddleware.auth, CommonService.uploadFilesDetails); // Assuming authentication is required for uploads
 
 router.get('/download', (req: Request, res: Response) => {
   const { filename } = req.query;

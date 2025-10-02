@@ -5,6 +5,7 @@ import CaseRepository from '../../repositories/general/CaseRepository';
 import CommitteeRepository from '../../repositories/general/CommitteeRepository';
 import uploadsService from './uploads.service';
 import Uploads from '../../models/Uploads';
+import SequelizeClass from '../../../database/sequelize';
 
 class CommonService {
   static async getPageActionsByRole(roleId: number, pageLabel: string) {
@@ -68,6 +69,33 @@ class CommonService {
     const cases = await CaseRepository.getDashboardCases();
     const committees = await CommitteeRepository.getCommittees();
     res.generalResponse('Dashboard cases fetched successfully!', { cases, committees: committees?.rows });
+  }
+
+  static async uploadFilesDetails(req: Request, res: Response) {
+    try {
+      const { ids } = req.body; // Expecting an array of upload IDs (fileHash)
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: "No upload IDs provided" });
+      }
+      const sequelize = SequelizeClass.getInstance().sequelize;
+      const query = `
+        SELECT u.*, usr.name as uploadedByName, usr.email as uploadedByEmail
+        FROM uploads u
+        LEFT JOIN users usr ON u."uploadedBy" = usr.id
+        WHERE u."fileHash" IN (:ids)
+      `;
+      const uploads: any = await sequelize.query(query, {
+        replacements: { ids },
+        type: require('sequelize').QueryTypes.SELECT
+      });
+      if (!uploads || uploads.length === 0) {
+        return res.status(404).json({ message: "No uploads found" });
+      }
+      res.generalResponse('Upload details fetched successfully!', { uploads });
+    } catch (error) {
+      console.error('Error fetching upload details:', error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
   }
 }
 
