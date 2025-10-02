@@ -171,3 +171,13 @@ export interface ICommittee {
   deletedBy?: number;
   deletedAt?: Date;
 }
+
+export interface IUploads {
+  id?: number;
+  fileHash: string;
+  originalName: string;
+  filePath: string;
+  uploadedBy: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

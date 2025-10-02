@@ -42,6 +42,7 @@ class UploadsService {
       fileHash,
       originalName: file.originalname,
       filePath,
+      uploadedBy: req.user?.id // Assuming req.user contains authenticated user info
     });
     return fileHash;
   }
@@ -49,7 +50,6 @@ class UploadsService {
   // Handle multiple file uploads
   async uploadMultipleFiles(req: Request): Promise<string[]> {
     const files = (req as any).files;
-    console.log("req ============>", req?.file,  req?.files); return [];
     if (!files || !Array.isArray(files) || files.length === 0) throw new Error('No files uploaded');
     const fileHashes: string[] = [];
     for (const file of files) {
@@ -62,6 +62,7 @@ class UploadsService {
         fileHash,
         originalName: file.originalname,
         filePath,
+        uploadedBy: req.user?.id // Assuming req.user contains authenticated user info
       });
       fileHashes.push(fileHash);
     }

@@ -1,16 +1,10 @@
 import { DataTypes, Model } from 'sequelize';
 import SequelizeClass from '../../database/sequelize';
+import { IUploads } from './interfaces';
 
 const sequelize = SequelizeClass.getInstance().sequelize;
 
-class Uploads extends Model {
-  public id!: number;
-  public fileHash!: string;
-  public originalName!: string;
-  public filePath!: string;
-  public createdAt!: Date;
-  public updatedAt!: Date;
-}
+class Uploads extends Model<IUploads> {}
 
 Uploads.init(
   {
@@ -30,6 +24,10 @@ Uploads.init(
     },
     filePath: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    uploadedBy: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   },

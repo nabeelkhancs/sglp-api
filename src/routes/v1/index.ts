@@ -7,6 +7,7 @@ import RegisterDTO from '../../dto/classes/Register.dto';
 import multer, { FileFilterCallback } from "multer";
 import CommonService from '../../services/general/common.service';
 import path from 'path';
+import AuthMiddleware from '../../auth/jwt';
 
 const router: Router = express.Router();
 

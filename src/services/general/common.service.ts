@@ -3,6 +3,8 @@ import PermissionsService from '../rbac/permissions.service';
 import * as jwt from 'jsonwebtoken';
 import CaseRepository from '../../repositories/general/CaseRepository';
 import CommitteeRepository from '../../repositories/general/CommitteeRepository';
+import uploadsService from './uploads.service';
+import Uploads from '../../models/Uploads';
 
 class CommonService {
   static async getPageActionsByRole(roleId: number, pageLabel: string) {
@@ -29,12 +31,32 @@ class CommonService {
     return jwt.sign(payload, secret, { expiresIn: '24h' });
   }
 
-  static uploadFiles(req: Request, res: Response) {
+  static async uploadFiles(req: Request, res: Response) {
+    let token = '';   
+    if (req?.headers?.authorization?.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1].trim()
+    }
+
+    if (!token) {
+      return res.generalError("Authentication required", { error: 'Authentication required' }, 401);
+    }
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET || '')
+    req.user = decoded;
+
+    console.log("req.user", req.user);
+
     const files = req.files as Express.Multer.File[];
 
     if (!files || files.length === 0) {
       return res.status(400).json({ message: "No files uploaded" });
     }
+
+    await Promise.all(files.map(file => Uploads.create({
+      fileHash: file.filename.split('-')[0],
+      originalName: file.originalname,
+      filePath: file.path,
+      uploadedBy: req.user?.id
+    })));
 
     res.json({
       message: `${files.length} file(s) uploaded successfully`,

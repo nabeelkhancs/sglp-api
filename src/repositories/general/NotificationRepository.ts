@@ -133,8 +133,8 @@ class NotificationRepository {
       
       const replacements = { userId };
       
-      console.log('Notification Count Query:', query);
-      console.log('Replacements:', replacements);
+      // console.log('Notification Count Query:', query);
+      // console.log('Replacements:', replacements);
       
       const result = await sequelize.query(query, {
         type: QueryTypes.SELECT,
