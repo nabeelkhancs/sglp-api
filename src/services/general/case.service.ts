@@ -108,6 +108,14 @@ class CaseService {
   async deleteCase(id: string) {
     // Logic to delete a case
   }
+
+  static async searchCases(req: Request, res: Response) {
+    const { query, pageNumber, pageSize } = req.body;
+
+    const result = await CaseRepository.searchCases(query, pageNumber, pageSize);
+    res.generalResponse('Cases fetched successfully!', result);
+  }
+
 }
 
 export default CaseService;

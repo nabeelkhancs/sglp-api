@@ -190,6 +190,37 @@ class CaseRepository {
             throw new Error("Could not fetch courts count");
         }
     }
+
+    static async searchCases(queryString: string, pageNumber: number = 1, pageSize: number = 10): Promise<{ rows: Cases[]; count: number }> {
+        try {
+            const whereClause: any = { isDeleted: false };
+            if (queryString) {
+                whereClause[Op.or] = [
+                    { caseNumber: { [Op.like]: `%${queryString}%` } },
+                    { caseTitle: { [Op.like]: `%${queryString}%` } },
+                ];
+            }
+
+            const { count, rows } = await Cases.findAndCountAll({
+                where: whereClause,
+                attributes: [
+                  'cpNumber',
+                  'caseNumber',
+                  'caseTitle',
+                  'dateOfHearing',
+                  'dateReceived',
+                  'createdAt'
+                ],
+                // limit: pageSize,
+                // offset: (pageNumber - 1) * pageSize,
+                order: [['updatedAt', 'DESC']],
+            });
+            return { rows, count };
+        } catch (error) {
+            console.error("Error searching cases:", error);
+            throw new Error("Could not search cases");
+        }
+    }
 }
 
 export default CaseRepository;
