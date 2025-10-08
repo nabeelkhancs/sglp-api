@@ -110,9 +110,11 @@ class CaseService {
   }
 
   static async searchCases(req: Request, res: Response) {
-    const { query, pageNumber, pageSize } = req.body;
-
-    const result = await CaseRepository.searchCases(query, pageNumber, pageSize);
+    const { pageNumber, pageSize } = req.body;
+    const { query } = req.query;
+    const queryString = typeof query === 'string' ? query : '';
+    
+    const result = await CaseRepository.searchCases(queryString, pageNumber, pageSize);
     res.generalResponse('Cases fetched successfully!', result);
   }
 

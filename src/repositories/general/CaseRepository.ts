@@ -193,6 +193,7 @@ class CaseRepository {
 
     static async searchCases(queryString: string, pageNumber: number = 1, pageSize: number = 10): Promise<{ rows: Cases[]; count: number }> {
         try {
+            
             const whereClause: any = { isDeleted: false };
             if (queryString) {
                 whereClause[Op.or] = [
@@ -200,7 +201,7 @@ class CaseRepository {
                     { caseTitle: { [Op.like]: `%${queryString}%` } },
                 ];
             }
-
+            
             const { count, rows } = await Cases.findAndCountAll({
                 where: whereClause,
                 attributes: [

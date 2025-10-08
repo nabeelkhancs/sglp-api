@@ -8,7 +8,7 @@ import { User } from '../../models';
 class NotificationRepository {
   static async findAll(where: any, order: any = [], pageNumber: number = 1, pageSize: number = 10) {
     try {
-      console.log("Finding notifications with where:", where, "and order:", order);
+      // console.log("Finding notifications with where:", where, "and order:", order);
       
       const include = [
         {
