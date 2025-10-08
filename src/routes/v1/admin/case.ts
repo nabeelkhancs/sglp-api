@@ -6,6 +6,7 @@ import validateDTO from "../../../dto/middlewares";
 const router: Router = express.Router();
 
 router.post("/",CaseService.createCase)
+router.get("/search", CaseService.searchCases)
 router.get("/courts", CaseService.getCourtsCount)
 // router.delete("/:id", CaseService.deleteAction)
 router.put("/:id", CaseService.updateCase)
