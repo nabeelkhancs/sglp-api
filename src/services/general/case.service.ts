@@ -125,7 +125,8 @@ class CaseService {
     const page = pageNumber ? parseInt(pageNumber as string) : 1;
     const size = pageSize ? parseInt(pageSize as string) : 10;
 
-    const result = await CaseRepository.getLogs(page, size, cpNumber);
+    const cpNumStr = typeof cpNumber === 'string' ? cpNumber : undefined;
+    const result = await CaseRepository.getLogs(page, size, cpNumStr);
 
     res.generalResponse('Logs fetched successfully!', result);
   });
