@@ -6,6 +6,7 @@ import PermissionsService from '../rbac/permissions.service';
 import CommonService from './common.service';
 import AuditLogsRepository from '../../repositories/general/AuditLogsRepository';
 class CaseService {
+
   static createCase = asyncHandler(async (req: Request, res: Response) => {
     const caseData: ICases = req.body;
     const otherCaseData = {
@@ -117,6 +118,17 @@ class CaseService {
     const result = await CaseRepository.searchCases(queryString, pageNumber, pageSize);
     res.generalResponse('Cases fetched successfully!', result);
   }
+
+  static getLogs = asyncHandler(async (req: Request, res: Response) => {
+    const { pageNumber, pageSize, cpNumber } = req.query;
+
+    const page = pageNumber ? parseInt(pageNumber as string) : 1;
+    const size = pageSize ? parseInt(pageSize as string) : 10;
+
+    const result = await CaseRepository.getLogs(page, size, cpNumber);
+
+    res.generalResponse('Logs fetched successfully!', result);
+  });
 
 }
 
