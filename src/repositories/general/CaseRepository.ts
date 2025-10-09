@@ -88,7 +88,7 @@ class CaseRepository {
                     delete whereFilters.caseStatus;
                 }
             }
-            console.log("Where Filters:", whereFilters);
+            // console.log("Where Filters:", whereFilters);
             const { count, rows } = await Cases.findAndCountAll({
                 where: whereFilters,
                 limit: pageSize,
@@ -197,7 +197,7 @@ class CaseRepository {
             const whereClause: any = { isDeleted: false };
             if (queryString) {
                 whereClause[Op.or] = [
-                    { caseNumber: { [Op.like]: `%${queryString}%` } },
+                    { cpNumber: { [Op.like]: `%${queryString}%` } },
                     { caseTitle: { [Op.like]: `%${queryString}%` } },
                 ];
             }

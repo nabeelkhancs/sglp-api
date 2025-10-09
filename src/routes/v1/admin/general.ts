@@ -11,7 +11,6 @@ router.post("/typedata", TypeData.getTypeData);
 // Single file upload (field name: 'file')
 router.post("/uploads", upload.single('file'), async (req, res) => {
   try {
-    console.log("File upload request received");
     const fileHash = await uploadsService.uploadSingleFile(req);
     res.json({ fileHash });
   } catch (err: any) {

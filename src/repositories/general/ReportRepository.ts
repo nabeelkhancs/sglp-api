@@ -54,8 +54,8 @@ class ReportRepository {
       
       query += ` ORDER BY "createdAt" DESC`;
       
-      console.log('Raw Query:', query);
-      console.log('Replacements:', replacements);
+      // console.log('Raw Query:', query);
+      // console.log('Replacements:', replacements);
       
       return await sequelize.query(query, {
         type: QueryTypes.SELECT,

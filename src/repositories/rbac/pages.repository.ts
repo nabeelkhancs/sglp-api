@@ -19,7 +19,7 @@ class PagesRepository {
   }
   
   static async getPagesByIds(ids: number[]): Promise<any> {
-    console.log("ids in pag", ids)
+    // console.log("ids in pag", ids)
     return Pages.findAll({
       where: {
         id: {

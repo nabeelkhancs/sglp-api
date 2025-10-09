@@ -12,7 +12,7 @@ class NotificationService {
     const order = [['createdAt', 'DESC']];
     const pageNumber = req.query.pageNumber || 1;
     const pageSize = req.query.pageSize || 10;
-    console.log("where:", where);
+    // console.log("where:", where);
     const notifications = await NotificationRepository.findAll(where, order, Number(pageNumber), Number(pageSize));
     res.generalResponse('Notifications fetched successfully!', notifications);
   });
