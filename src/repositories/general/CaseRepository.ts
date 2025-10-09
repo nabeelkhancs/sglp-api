@@ -232,13 +232,40 @@ class CaseRepository {
         whereClause.cpNumber = cpNumber;
       }
 
+      // Import User model
+      const User = (await import('../../models/Users')).default;
       const { count, rows } = await AuditLogs.findAndCountAll({
         where: whereClause,
         limit: pageSize,
         offset,
         order: [['createdAt', 'DESC']],
+        attributes: [
+          'id',
+          'action',
+          'cpNumber',
+          'payload',
+          'createdAt',
+          'userId'
+        ],
+        include: [
+          {
+            model: User,
+            attributes: ['name', 'govtID'],
+            required: false,
+            as: 'user'
+          }
+        ]
       });
-      return { rows, count };
+      // Map results to flatten user info
+      const mappedRows = rows.map((row: any) => {
+        const json = row.toJSON();
+        return {
+          ...json,
+          userName: json.user?.name || null,
+          userGovtID: json.user?.govtID || null
+        };
+      });
+      return { rows: mappedRows, count };
     } catch (error) {
       console.error("Error fetching logs:", error);
       throw new Error("Could not fetch logs");
