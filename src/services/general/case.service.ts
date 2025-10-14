@@ -23,7 +23,7 @@ class CaseService {
       result.caseNumber = caseNumber;
     }
     // Log audit action for case creation
-    await AuditLogsRepository.logAction(result.toJSON(), req, result.cpNumber, 'CREATE_CASE');
+    await AuditLogsRepository.logAction(req.body, req, result.cpNumber, 'CREATE_CASE');
     res.generalResponse("Case created successfully!", { ...result.toJSON() });
   });
 
@@ -95,7 +95,7 @@ class CaseService {
       return res.status(404).json({ error: 'Case not found' });
     }
     // Log audit action for case update
-    await AuditLogsRepository.logAction(updatedCase.toJSON(), req, updatedCase.cpNumber, 'UPDATE_CASE');
+    await AuditLogsRepository.logAction(req.body, req, updatedCase.cpNumber, 'UPDATE_CASE');
     res.generalResponse('Case updated successfully!', updatedCase);
   });
 
@@ -129,6 +129,21 @@ class CaseService {
     const result = await CaseRepository.getLogs(page, size, cpNumStr);
 
     res.generalResponse('Logs fetched successfully!', result);
+  });
+
+  static deleteCaseImage = asyncHandler(async (req: Request, res: Response) => {
+    const { id, imageId } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Please provide id as a route parameter' });
+    }
+
+    const result = await CaseRepository.deleteCaseImage(id, imageId);
+    if (!result) {
+      return res.status(404).json({ error: 'Case or image not found' });
+    }
+
+    res.generalResponse('Case image deleted successfully!', result);
   });
 
 }

@@ -35,6 +35,15 @@ class CaseRepository {
       if (!caseRecord) {
         throw new Error("Case not found");
       }
+
+      if (caseData.uploadedFiles && Array.isArray(caseData.uploadedFiles)) {
+        const existingFiles = (caseRecord as any).uploadedFiles || [];
+        const newFiles = caseData.uploadedFiles;
+        
+        const mergedFiles = [...new Set([...existingFiles, ...newFiles])];
+        caseData.uploadedFiles = mergedFiles;
+      }
+
       const updatedCase = await caseRecord.update(caseData);
       return updatedCase;
     } catch (error) {
@@ -250,7 +259,7 @@ class CaseRepository {
         include: [
           {
             model: User,
-            attributes: ['name', 'govtID'],
+            attributes: ['name', 'govtID', 'roleType'],
             required: false,
             as: 'user'
           }
@@ -269,6 +278,21 @@ class CaseRepository {
     } catch (error) {
       console.error("Error fetching logs:", error);
       throw new Error("Could not fetch logs");
+    }
+  }
+
+  static async deleteCaseImage(id: string, imageId: string) {
+    try {
+      const result = await Cases.update(
+        {
+          uploadedFiles: Cases.sequelize!.fn('array_remove', Cases.sequelize!.col('uploadedFiles'), imageId)
+        },
+        { where: { id } }
+      );
+      return result[0] > 0; // Returns true if any row was updated
+    } catch (error) {
+      console.error("Error deleting case image:", error);
+      throw new Error("Could not delete case image");
     }
   }
 
