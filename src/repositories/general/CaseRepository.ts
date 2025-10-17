@@ -310,7 +310,8 @@ class CaseRepository {
           'dateOfHearing',
           'cpNumber',
           'caseStatus',
-          'caseType'
+          'caseType',
+          'subjectOfApplication'
         ]
       });
       return cases;
