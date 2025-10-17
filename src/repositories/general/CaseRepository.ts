@@ -347,9 +347,7 @@ class CaseRepository {
           'cpNumber',
           'caseStatus',
           'caseType',
-          'subjectOfApplication',
-          'isUrgent',
-          'isCsCalledInPerson'
+          'subjectOfApplication'
         ]
       });
 
