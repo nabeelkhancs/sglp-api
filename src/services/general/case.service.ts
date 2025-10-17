@@ -146,6 +146,16 @@ class CaseService {
     res.generalResponse('Case image deleted successfully!', result);
   });
 
+  static calendarViewCases = asyncHandler(async (req: Request, res: Response) => {
+    const { startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({ error: 'Please provide startDate and endDate as query parameters' });
+    }
+    const result = await CaseRepository.calendarViewCases(String(startDate), String(endDate));
+    res.generalResponse('Calendar view cases fetched successfully!', result);
+  });
+
 }
 
 export default CaseService;

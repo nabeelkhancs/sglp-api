@@ -296,6 +296,28 @@ class CaseRepository {
     }
   }
 
+  static async calendarViewCases(startDate: string, endDate: string) {
+    try {
+      const cases = await Cases.findAll({
+        where: {
+          dateOfHearing: {
+            [Op.between]: [startDate, endDate]
+          }
+        },
+        attributes: [
+          'id',
+          'caseTitle',
+          'dateOfHearing',
+          'cpNumber'
+        ]
+      });
+      return cases;
+    } catch (error) {
+      console.error("Error fetching calendar view cases:", error);
+      throw new Error("Could not fetch calendar view cases");
+    }
+  } 
+
 }
 
 export default CaseRepository;
