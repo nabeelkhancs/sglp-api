@@ -308,7 +308,9 @@ class CaseRepository {
           'id',
           'caseTitle',
           'dateOfHearing',
-          'cpNumber'
+          'cpNumber',
+          'caseStatus',
+          'caseType'
         ]
       });
       return cases;
@@ -316,7 +318,7 @@ class CaseRepository {
       console.error("Error fetching calendar view cases:", error);
       throw new Error("Could not fetch calendar view cases");
     }
-  } 
+  }
 
 }
 
