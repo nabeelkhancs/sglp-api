@@ -156,6 +156,11 @@ class CaseService {
     res.generalResponse('Calendar view cases fetched successfully!', result);
   });
 
+  static noticeBoardCases = asyncHandler(async (req: Request, res: Response) => {
+    const result = await CaseRepository.noticeBoardCases();
+    res.generalResponse('Notice board cases fetched successfully!', result);
+  });
+
 }
 
 export default CaseService;

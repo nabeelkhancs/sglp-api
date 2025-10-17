@@ -39,7 +39,7 @@ class CaseRepository {
       if (caseData.uploadedFiles && Array.isArray(caseData.uploadedFiles)) {
         const existingFiles = (caseRecord as any).uploadedFiles || [];
         const newFiles = caseData.uploadedFiles;
-        
+
         const mergedFiles = [...new Set([...existingFiles, ...newFiles])];
         caseData.uploadedFiles = mergedFiles;
       }
@@ -321,6 +321,85 @@ class CaseRepository {
     }
   }
 
+  static async noticeBoardCases() {
+    try {
+      const today = new Date();
+      const fifteenDaysLater = new Date();
+      fifteenDaysLater.setDate(today.getDate() + 15);
+
+      const cases = await Cases.findAll({
+        where: {
+          isDeleted: false,
+          [Op.or]: [
+            {
+              dateOfHearing: {
+                [Op.between]: [today, fifteenDaysLater]
+              }
+            }
+          ]
+        },
+        attributes: [
+          'id',
+          'caseTitle',
+          'dateOfHearing',
+          'dateReceived',
+          'createdAt',
+          'cpNumber',
+          'caseStatus',
+          'caseType',
+          'subjectOfApplication',
+          'isUrgent',
+          'isCsCalledInPerson'
+        ]
+      });
+
+      // Add highlighting logic for each case
+      const highlightedCases = cases.map((caseItem: any) => {
+        const caseJson = caseItem.toJSON();
+        const currentDate = new Date();
+        const hearingDate = new Date(caseJson.dateOfHearing);
+        const daysDiff = Math.ceil((hearingDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24));
+        
+        // Determine highlight reasons
+        const highlightReasons = [];
+        let priorityLevel = 'normal'; // normal, medium, high, critical
+        
+        if (caseJson.isUrgent) {
+          highlightReasons.push('urgent');
+          priorityLevel = 'critical';
+        }
+        
+        if (caseJson.isCsCalledInPerson) {
+          highlightReasons.push('csCalledInPerson');
+          if (priorityLevel === 'normal') priorityLevel = 'high';
+        }
+        
+        if (caseJson.dateOfHearing && daysDiff <= 15 && daysDiff >= 0) {
+          highlightReasons.push('upcomingHearing');
+          if (daysDiff <= 7) {
+            highlightReasons.push('urgentHearing');
+            if (priorityLevel === 'normal') priorityLevel = 'medium';
+          }
+          if (daysDiff <= 3) {
+            priorityLevel = 'high';
+          }
+        }
+        
+        return {
+          ...caseJson,
+          isHighlighted: highlightReasons.length > 0,
+          highlightReasons,
+          priorityLevel,
+          daysUntilHearing: caseJson.dateOfHearing ? daysDiff : null
+        };
+      });
+
+      return highlightedCases;
+    } catch (error) {
+      console.error("Error fetching notice board cases:", error);
+      throw new Error("Could not fetch notice board cases");
+    }
+  }
 }
 
 export default CaseRepository;

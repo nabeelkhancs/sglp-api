@@ -5,6 +5,7 @@ const router: Router = express.Router();
 
 router.post("/",CaseService.createCase)
 router.get("/search", CaseService.searchCases)
+router.get("/notice-board", CaseService.noticeBoardCases)
 router.get("/calendar", CaseService.calendarViewCases)
 router.get("/courts", CaseService.getCourtsCount)
 router.get("/logs", CaseService.getLogs)
