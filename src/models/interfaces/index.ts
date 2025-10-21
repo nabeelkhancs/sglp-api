@@ -102,6 +102,8 @@ export interface INotifications {
   isRead?: boolean;
   auditLogId?: number | null;
   createdBy?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
   updatedBy?: string;
   deletedBy?: string;
   deletedAt?: Date;

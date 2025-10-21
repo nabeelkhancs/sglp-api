@@ -2,6 +2,7 @@ import AuditLogs from '../../models/AuditLogs';
 import { IAuditLogs } from '../../models/interfaces';
 import { Request } from 'express';
 import Notifications from '../../models/Notifications';
+import { create } from 'domain';
 class AuditLogsRepository {
   static async createLog(logData: Omit<IAuditLogs, 'id'>): Promise<AuditLogs> {
     try {
@@ -52,7 +53,9 @@ class AuditLogsRepository {
         to: String(user.id),
         auditLogId: log.id,
         createdBy: log.createdBy ?? null,
-        updatedBy: log.updatedBy ?? null
+        updatedBy: log.updatedBy ?? null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }));
       if (notifications.length > 0) {
         await Notifications.bulkCreate(notifications);

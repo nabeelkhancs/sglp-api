@@ -24,6 +24,14 @@ Notifications.init({
     type: DataTypes.INTEGER,
     allowNull: true,
   },
+  createdAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
   updatedBy: {
     type: DataTypes.INTEGER,
     allowNull: true,
