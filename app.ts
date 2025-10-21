@@ -5,6 +5,7 @@ import cors from 'cors';
 import v1Routes from './src/routes/v1';
 import v2Routes from './src/routes/v2';
 import { errorHandler, handleAPIResponse } from './src/middlewares';
+import CronJobs from './src/cron';
 
 
 const app: Express = express();
@@ -31,4 +32,7 @@ app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+  
+  // Initialize cron jobs for hearing reminders
+  CronJobs.init();
 });

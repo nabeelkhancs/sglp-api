@@ -12,6 +12,7 @@ import reportsRoutes from "./reports";
 import committeeRoutes from "./committee";
 import AuthMiddleware from "../../../auth/jwt";
 import notificationsRoutes from "./notifications";
+import cronRoutes from "./cron";
 import CommonService from "../../../services/general/common.service";
 
 
@@ -28,6 +29,7 @@ router.use("/cases", AuthMiddleware.auth,  caseRoutes)
 router.use("/committees", AuthMiddleware.auth,  committeeRoutes)
 router.use("/dashboard", AuthMiddleware.auth, CommonService.getDashboardCases)
 router.use("/notifications", AuthMiddleware.auth, notificationsRoutes)
+router.use("/cron", AuthMiddleware.auth, cronRoutes)
 router.use("/reports", AuthMiddleware.auth, reportsRoutes)
 
 export default router;
