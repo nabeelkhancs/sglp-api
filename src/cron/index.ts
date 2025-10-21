@@ -5,10 +5,9 @@ class CronJobs {
   static init() {
     console.log('Initializing cron jobs...');
 
-    // Run every hour to check for upcoming hearings (24 hours before)
-    cron.schedule('*/5 * * * *', async () => {
-    // cron.schedule('0 * * * *', async () => {
-      console.log('Running hearing reminder cron job at:', new Date().toISOString());
+    // Run every day at 9:00 AM to check for upcoming hearings (24 hours before)
+    cron.schedule('0 9 * * *', async () => {
+      console.log('Running daily hearing reminder cron job at:', new Date().toISOString());
       try {
         await HearingReminderService.checkUpcomingHearings();
       } catch (error) {
@@ -16,10 +15,9 @@ class CronJobs {
       }
     });
 
-    // Run every 4 hours to check for final reminders (12 hours before)
-    cron.schedule('*/5 * * * *', async () => {
-    // cron.schedule('0 */4 * * *', async () => {
-      console.log('Running final hearing reminder cron job at:', new Date().toISOString());
+    // Run every day at 10:00 AM to check for final reminders (12 hours before)
+    cron.schedule('0 10 * * *', async () => {
+      console.log('Running daily final hearing reminder cron job at:', new Date().toISOString());
       try {
         await HearingReminderService.checkFinalReminders();
       } catch (error) {
