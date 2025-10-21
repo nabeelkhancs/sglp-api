@@ -20,6 +20,18 @@ Notifications.init({
     type: DataTypes.STRING,
     allowNull: true
   },
+  cpNumber: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  caseTitle: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  dateOfHearing: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   createdBy: {
     type: DataTypes.INTEGER,
     allowNull: true,

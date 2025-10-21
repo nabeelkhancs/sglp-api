@@ -93,6 +93,9 @@ export interface INotifications {
   id?: number;
   type?: string;
   sender?: string;
+  cpNumber?: string;
+  caseTitle?: string;
+  dateOfHearing?: string;
   to?: string | null;
   cc?: string[] | null;
   bcc?: string[] | null;

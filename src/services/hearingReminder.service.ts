@@ -1,8 +1,8 @@
 import Cases from '../models/Case';
 import Notifications from '../models/Notifications';
-import AuditLogs from '../models/AuditLogs';
 import { User } from '../models';
 import { Op } from 'sequelize';
+import { cp } from 'fs';
 
 interface HearingReminder {
   caseId: number;
@@ -15,9 +15,6 @@ interface HearingReminder {
 
 class HearingReminderService {
   
-  /**
-   * Check for hearings within 24 hours and create initial reminders
-   */
   static async checkUpcomingHearings(): Promise<void> {
     try {
       const now = new Date();
@@ -39,9 +36,9 @@ class HearingReminderService {
       for (const caseItem of upcomingCases) {
         const caseData = caseItem.toJSON() as any;
         const hoursUntilHearing = this.calculateHoursUntilHearing(caseData.dateOfHearing);
-        
+        console.log(`Case ${caseData.cpNumber} has hearing in ${hoursUntilHearing} hours`);
         // Only process if hearing is within 24 hours
-        if (hoursUntilHearing <= 24 && hoursUntilHearing > 0) {
+        if (hoursUntilHearing <= 24 && hoursUntilHearing >= 0) {
           await this.createHearingReminder({
             caseId: caseData.id,
             cpNumber: caseData.cpNumber,
@@ -58,9 +55,6 @@ class HearingReminderService {
     }
   }
 
-  /**
-   * Check for hearings within 12 hours and create final reminders
-   */
   static async checkFinalReminders(): Promise<void> {
     try {
       const now = new Date();
@@ -101,40 +95,27 @@ class HearingReminderService {
     }
   }
 
-  /**
-   * Create hearing reminder notification if not already exists
-   */
   private static async createHearingReminder(reminder: HearingReminder): Promise<void> {
     try {
-      // Check if reminder already exists for this case and type
-      const existingReminder = await this.checkExistingReminder(
-        reminder.cpNumber, 
-        reminder.reminderType
-      );
+      console.log(`Checking ${reminder.reminderType} reminder for case ${reminder.cpNumber} (${reminder.hoursUntilHearing}h until hearing)`);
+      
+      const checkNotifiedCases = await Notifications.findOne({
+        where: {
+          type: 'HEARING_REMINDER_24H',
+          cpNumber: reminder.cpNumber
+        }
+      });
 
-      if (existingReminder) {
-        console.log(`${reminder.reminderType} reminder already exists for case ${reminder.cpNumber}`);
+      if (checkNotifiedCases) {
+        console.log(`✓ ${reminder.reminderType} reminder already sent for case ${reminder.cpNumber} - skipping`);
         return;
       }
+      // if (existingReminder) {
+      //   console.log(`✓ ${reminder.reminderType} reminder already exists for case ${reminder.cpNumber} within last 12 hours - skipping`);
+      //   return;
+      // }
 
-      // Create audit log for the reminder
-      const auditLog = await AuditLogs.create({
-        action: reminder.reminderType === 'initial' ? 'HEARING_REMINDER_24H' : 'HEARING_REMINDER_12H',
-        cpNumber: reminder.cpNumber,
-        payload: JSON.stringify({
-          caseId: reminder.caseId,
-          caseTitle: reminder.caseTitle,
-          dateOfHearing: reminder.dateOfHearing.toISOString(),
-          hoursUntilHearing: reminder.hoursUntilHearing,
-          reminderType: reminder.reminderType
-        }),
-        userId: 1, 
-        isDeleted: false,
-        createdBy: '1',
-        updatedBy: '1',
-        deletedBy: '',
-        deletedAt: null
-      });
+      console.log(`→ Creating new ${reminder.reminderType} reminder for case ${reminder.cpNumber}`);
 
       // Get all active users for notification
       const users = await User.findAll({
@@ -152,12 +133,14 @@ class HearingReminderService {
         return;
       }
 
-      // Create notifications for all users using bulkCreate
+      // Create notifications for all users using bulkCreate (without audit log)
       const notifications = users.map((user: any) => ({
         type: reminder.reminderType === 'initial' ? 'HEARING_REMINDER_24H' : 'HEARING_REMINDER_12H',
         to: String(user.id),
-        auditLogId: (auditLog as any).id,
         isRead: false,
+        cpNumber: reminder.cpNumber,
+        caseTitle: reminder.caseTitle,
+        dateOfHearing: reminder.dateOfHearing.toString(),
         createdBy: '1',
         createdAt: new Date(),
         updatedBy: '1'
@@ -165,7 +148,7 @@ class HearingReminderService {
 
       await Notifications.bulkCreate(notifications);
 
-      console.log(`${reminder.reminderType} hearing reminder created for case ${reminder.cpNumber} - ${users.length} users notified`);
+      console.log(`✓ ${reminder.reminderType} hearing reminder created for case ${reminder.cpNumber} - ${users.length} users notified`);
 
     } catch (error) {
       console.error('Error creating hearing reminder:', error);
@@ -174,25 +157,35 @@ class HearingReminderService {
   }
 
   /**
-   * Check if reminder already exists for the case and type
+   * Check if reminder already exists for the case and type within last 12 hours
    */
   private static async checkExistingReminder(cpNumber: string, reminderType: 'initial' | 'final'): Promise<boolean> {
     try {
       const actionType = reminderType === 'initial' ? 'HEARING_REMINDER_24H' : 'HEARING_REMINDER_12H';
       
-      // Check if audit log exists for this reminder type in the last 25 hours (for initial) or 13 hours (for final)
-      const timeThreshold = reminderType === 'initial' ? 25 : 13;
-      const since = new Date(Date.now() - (timeThreshold * 60 * 60 * 1000));
+      // Check if notification was generated within the last 12 hours
+      const twelveHoursAgo = new Date(Date.now() - (12 * 60 * 60 * 1000));
 
-      const existingAuditLog = await AuditLogs.findOne({
+      // Check notifications directly for this case type within last 12 hours
+      // Since we're not using audit logs anymore, we'll search by notification type and pattern
+      const recentNotifications = await Notifications.findOne({
         where: {
-          cpNumber,
-          action: actionType,
-          isDeleted: false
-        }
+          type: actionType,
+          createdAt: {
+            [Op.gte]: twelveHoursAgo
+          }
+        },
+        order: [['createdAt', 'DESC']]
       });
 
-      return !!existingAuditLog;
+      if (recentNotifications) {
+        console.log(`Found existing ${reminderType} reminder notification created within last 12 hours - skipping duplicate`);
+        return true;
+      }
+
+      console.log(`No recent ${reminderType} reminder notifications found - proceeding with creation`);
+      return false;
+      
     } catch (error) {
       console.error('Error checking existing reminder:', error);
       return false; // If error, assume no existing reminder to avoid blocking
