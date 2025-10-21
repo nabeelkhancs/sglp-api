@@ -91,7 +91,9 @@ class UserService {
     // console.log("req.body", req.body)
     const user = await UserRepository.findUserByEmail(email);
     // console.log("user", user)
-
+    if(user.status !== 'Approved') {
+      return  res.generalError("Your account is not approved yet!", {}, 403);
+    }
     if (!user || user === null) {
       res.generalError("Username or password is not valid!", {}, 404);
     } else if (user['Role.type'] === 'ADMIN') {
