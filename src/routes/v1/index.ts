@@ -46,6 +46,7 @@ router.post('/verification', UserService.verification);
 // General routes
 router.get('/', (_req: Request, res: Response) => res.send("Welcome to SGLP API"));
 
+router.post('/uploads/public', upload.any(), CommonService.uploadPublicFiles);
 router.post('/uploads', upload.any(), CommonService.uploadFiles);
 router.post('/uploads/details', AuthMiddleware.auth, CommonService.uploadFilesDetails); // Assuming authentication is required for uploads
 

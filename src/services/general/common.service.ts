@@ -33,6 +33,7 @@ class CommonService {
   }
 
   static async uploadFiles(req: Request, res: Response) {
+
     let token = '';   
     if (req?.headers?.authorization?.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1].trim()
@@ -95,6 +96,31 @@ class CommonService {
     } catch (error) {
       console.error('Error fetching upload details:', error);
       return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+  static async uploadPublicFiles(req: Request, res: Response) {
+    try {
+      const files = req.files as Express.Multer.File[];
+
+      if (!files || files.length === 0) {
+        return res.status(400).json({ message: "No files uploaded" });
+      }
+
+      await Promise.all(files.map(file => Uploads.create({
+        fileHash: file.filename.split('-')[0],
+        originalName: file.originalname,
+        filePath: file.path,
+        uploadedBy: 0
+      })));
+
+      res.json({
+        message: `${files.length} file(s) uploaded successfully`,
+        files,
+      });
+    } catch (error) {
+      console.error('Error uploading public files:', error);
+      res.status(500).json({ message: "Internal server error" });
     }
   }
 }
