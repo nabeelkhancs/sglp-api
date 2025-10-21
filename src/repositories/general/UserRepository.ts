@@ -58,7 +58,7 @@ class UserRepository {
     const { pageNumber, pageSize, ...otherParams } = obj
     // const include = []
 
-    return Paginate(User, pageNumber, pageSize, otherParams)
+    return Paginate(User, pageNumber, pageSize, otherParams, [], [], true, false, [['createdAt', 'DESC']])
   }
 
 
