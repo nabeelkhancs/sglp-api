@@ -24,8 +24,8 @@ class NotificationRepository {
       
       const attributes = undefined; // Use all attributes
       
-      // Get paginated notifications
-      const paginatedResult = await Paginate(Notifications, Number(pageNumber), Number(pageSize), where, include, attributes);
+      // Get paginated notifications with proper ordering
+      const paginatedResult = await Paginate(Notifications, Number(pageNumber), Number(pageSize), where, include, attributes, order);
       
       // Get total unread count for the user
       const unreadWhere = { ...where, isRead: false };
