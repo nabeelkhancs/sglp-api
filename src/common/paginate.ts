@@ -35,9 +35,9 @@ const Paginate = async <T extends Model>(
   filter: MyObject = {},
   include: string[] | object[] = [],
   attributes: string[] = [],
-  order: any[] = [],
   havingIsDeleted: boolean = true,
   raw: boolean = false,
+  order: any = []
 ): Promise<PaginatedData<T>> => {
   const offset = (pageNumber - 1) * pageSize;
   const limit = Number(pageSize);
@@ -71,7 +71,7 @@ const Paginate = async <T extends Model>(
     if (order.length > 0) {
       obj['order'] = order
     }
-
+    
     const result = await model.findAndCountAll(obj);
 
 
