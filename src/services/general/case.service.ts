@@ -12,6 +12,10 @@ class CaseService {
     const otherCaseData = {
       createdBy: req.user.id,
     };
+    const casesAlready: any = await CaseRepository.findByCpNumber(caseData.cpNumber || '');
+    if (casesAlready && casesAlready?.id) {
+      return res.generalError('Case with the same CP Number already exists');
+    }
     const result: any = await CaseRepository.createCase({ ...caseData, ...otherCaseData });
     if (!result.caseNumber || result.caseNumber === "") {
       const date = new Date();

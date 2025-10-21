@@ -17,6 +17,18 @@ class CaseRepository {
     }
   }
 
+  static async findByCpNumber(cpNumber: string): Promise<Cases | null> {
+    try {
+      const caseRecord = await Cases.findOne({
+        where: { cpNumber, isDeleted: false },
+      });
+      return caseRecord;
+    } catch (error) {
+      console.error("Error finding case by CP number:", error);
+      throw new Error("Could not find case by CP number");
+    }
+  }
+
   static async createCase(caseData: Omit<ICases, 'id'>): Promise<Cases> {
     try {
       // Optionally, validate required fields here
