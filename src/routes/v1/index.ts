@@ -8,6 +8,8 @@ import multer, { FileFilterCallback } from "multer";
 import CommonService from '../../services/general/common.service';
 import path from 'path';
 import AuthMiddleware from '../../auth/jwt';
+import ForgetPasswordDTO from '../../dto/classes/ForgetPassword.dto';
+import ResetPasswordDTO from '../../dto/classes/ResetPassword.dto';
 
 const router: Router = express.Router();
 
@@ -42,6 +44,8 @@ router.post('/auth/login', UserService.revieweroperatorLogin);
 router.post('/auth/logout', UserService.logout);
 router.post('/verify-email', UserService.verifyEmail);
 router.post('/verification', UserService.verification);
+router.post('/forgot-password', validateDTO(ForgetPasswordDTO), UserService.forgotPassword);
+router.post('/reset-password', validateDTO(ResetPasswordDTO), UserService.resetPassword);
 
 // General routes
 router.get('/', (_req: Request, res: Response) => res.send("Welcome to SGLP API"));

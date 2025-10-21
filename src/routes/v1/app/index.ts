@@ -13,7 +13,7 @@ const router: Router = express.Router();
 router.post("/register", validateDTO(RegisterDTO), UserService.vistorRegister)
 router.post('/login', validateDTO(LoginDTO), UserService.visitorLogin);
 router.post('/logout', UserService.logout);
-router.post('/forgotPassword', validateDTO(ForgetPasswordDTO), UserService.forgotPassword);
+router.post('/forgot-password', validateDTO(ForgetPasswordDTO), UserService.forgotPassword);
 router.post('/verifyOtp', validateDTO(VerifyOtpDTO), UserService.verifyOtp);
 router.post('/changePassword', validateDTO(ChangePassDTO), UserService.changePassword);
 

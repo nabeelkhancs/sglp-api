@@ -228,26 +228,71 @@ class UserService {
   })
 
   static forgotPassword = asyncHandler(async (req: Request, res: Response) => {
-    console.log("Forgot call")
     const { email } = req.body;
-    // Take email
-    // Verify OTP
-    // change password
 
+    const user = await UserRepository.findUserByEmail(email);
 
-    // const isUserExist = await UserRepository.findUserByEmail(email);
-    // if (!isUserExist) {
-    //   res.generalError("User Not Found!", null , 404);
-    // } 
+    if (!user) {
+      // Return success message even if user doesn't exist for security reasons
+      return res.generalResponse("If the email exists, a password reset link has been sent.");
+    }
 
-    // OTP SERVICE
-    const createOtp = OTP.generateOTP();
-    const updateUser = await UserRepository.updateUserByEmail(email, parseInt(createOtp));
+    // Generate password reset token
+    const resetToken = CommonService.generatePasswordResetToken(user.id, user.email);
+    const resetLink = `${process.env.PASSWORD_RESET_URL}?token=${resetToken}`;
 
-    // EMAIL SERVICE        
-    res.generalResponse("please verify Otp:", updateUser);
+    try {
+      await emailService.sendTemplateMail(
+        user.email,
+        emailTemplates?.passwordReset?.subject,
+        emailTemplates?.passwordReset?.template,
+        { 
+          name: user.name,
+          resetLink: resetLink
+        }
+      );
 
+      console.log(`Password reset email sent to: ${user.email}`);
+      res.generalResponse("If the email exists, a password reset link has been sent.");
+    } catch (error) {
+      console.error("Error sending password reset email:", error);
+      res.generalError("Failed to send reset email. Please try again later.", null, 500);
+    }
+  });
 
+  static resetPassword = asyncHandler(async (req: Request, res: Response) => {
+    const { token, password, confirmPassword } = req.body;
+
+    // Validate that passwords match
+    if (password !== confirmPassword) {
+      return res.generalError("Passwords do not match", null, 400);
+    }
+
+    // Verify the reset token
+    const tokenData = CommonService.verifyPasswordResetToken(token);
+    if (!tokenData) {
+      return res.generalError("Invalid or expired reset token", null, 400);
+    }
+
+    try {
+      // Find the user
+      const user = await UserRepository.getUserById(tokenData.userId);
+      if (!user) {
+        return res.generalError("User not found", null, 404);
+      }
+
+      // Hash the new password
+      const hashedPassword = await PasswordManagerClass.encryptPassword(password);
+
+      // Update the user's password
+      await UserRepository.updateUser(tokenData.userId, { password: hashedPassword });
+
+      console.log(`Password reset successful for user: ${user.email}`);
+      res.generalResponse("Password has been reset successfully. You can now login with your new password.");
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      res.generalError("Failed to reset password. Please try again later.", null, 500);
+    }
   });
 
   static verifyOtp = asyncHandler(async (req: Request, res: Response) => {

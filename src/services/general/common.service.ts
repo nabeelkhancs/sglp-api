@@ -32,6 +32,38 @@ class CommonService {
     return jwt.sign(payload, secret, { expiresIn: '24h' });
   }
 
+  static generatePasswordResetToken(userId: number, email: string): string {
+    // 1 hour expiry for security
+    const payload = {
+      userId,
+      email,
+      type: 'password_reset'
+    };
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new Error('JWT_SECRET not defined');
+    return jwt.sign(payload, secret, { expiresIn: '1h' });
+  }
+
+  static verifyPasswordResetToken(token: string): { userId: number; email: string } | null {
+    try {
+      const secret = process.env.JWT_SECRET;
+      if (!secret) throw new Error('JWT_SECRET not defined');
+      
+      const decoded: any = jwt.verify(token, secret);
+      
+      if (decoded.type !== 'password_reset') {
+        return null;
+      }
+      
+      return {
+        userId: decoded.userId,
+        email: decoded.email
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
   static async uploadFiles(req: Request, res: Response) {
 
     let token = '';   
