@@ -23,15 +23,15 @@ Cases.init(
     },
     court: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     region: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     relativeDepartment: {
       type: DataTypes.ARRAY(DataTypes.STRING),
-      allowNull: false,
+      allowNull: true,
     },
     subjectOfApplication: {
       type: DataTypes.STRING,
@@ -47,11 +47,11 @@ Cases.init(
     },
     caseStatus: {
       type: DataTypes.ARRAY(DataTypes.STRING),
-      allowNull: false,
+      allowNull: true,
     },
     caseRemarks: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
     isUrgent: {
       type: DataTypes.BOOLEAN,
