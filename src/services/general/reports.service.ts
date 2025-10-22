@@ -8,27 +8,80 @@ class ReportService {
   static generateReport = asyncHandler(async (req: Request, res: Response) => {
     console.log("Generating report with data:", req.body);
     
-    const { caseType, year, months, isDirectionCase, isCsCalledInPerson } = req.body;
+    const { caseTypes, year, months, reportSections, isDirectionCase, isCsCalledInPerson } = req.body;
     
     // Prepare filters object for raw query
     const filters: any = {};
     
-    if (caseType) {
-      filters.caseType = caseType;
+    // Handle multiple case types
+    if (caseTypes && Array.isArray(caseTypes) && caseTypes.length > 0) {
+      filters.caseTypes = caseTypes;
     }
 
-    
-    // Build statusesToCheck array for caseStatus overlap check
-    const statusesToCheck = [];
-    if (isDirectionCase === true) {
-      statusesToCheck.push('direction');
+    // Handle report sections filtering
+    if (reportSections) {
+      const subjectFilters: string[] = [];
+      const statusFilters: string[] = [];
+      
+      // Process each report section
+      Object.entries(reportSections).forEach(([sectionKey, sectionConfig]: [string, any]) => {
+        if (sectionConfig.enabled) {
+          if (sectionConfig.filterType === 'subjectData') {
+            // Map section keys to subjectOfApplication values (using exact database values)
+            switch (sectionKey) {
+              case 'contemptApplication':
+                subjectFilters.push('contemptApplication');
+                break;
+              case 'committee':
+                subjectFilters.push('committee');
+                break;
+              case 'inquiryReport':
+                subjectFilters.push('inquiryReport');
+                break;
+            }
+          } else if (sectionConfig.filterType === 'statusData') {
+            // Map section keys to caseStatus values (using exact database values)
+            switch (sectionKey) {
+              case 'underCompliance':
+                statusFilters.push('underCompliance');
+                break;
+              case 'csCalledInPerson':
+                statusFilters.push('csCalledInPerson');
+                break;
+              case 'direction':
+                statusFilters.push('direction');
+                break;
+            }
+          }
+        }
+      });
+      
+      // Add subject filters if any
+      if (subjectFilters.length > 0) {
+        filters.subjectOfApplication = subjectFilters;
+        console.log("Applied subject filters:", subjectFilters);
+      }
+      
+      // Add status filters if any
+      if (statusFilters.length > 0) {
+        filters.statusesToCheck = statusFilters;
+        console.log("Applied status filters:", statusFilters);
+      }
     }
-    if (isCsCalledInPerson === true) {
-      statusesToCheck.push('csCalledInPerson');
-    }
     
-    if (statusesToCheck.length > 0) {
-      filters.statusesToCheck = statusesToCheck;
+    // Legacy support for isDirectionCase and isCsCalledInPerson
+    if (!reportSections) {
+      const statusesToCheck = [];
+      if (isDirectionCase === true) {
+        statusesToCheck.push('Direction');
+      }
+      if (isCsCalledInPerson === true) {
+        statusesToCheck.push('CS Called in Person');
+      }
+      
+      if (statusesToCheck.length > 0) {
+        filters.statusesToCheck = statusesToCheck;
+      }
     }
     
     // Handle date/month filtering
@@ -66,9 +119,10 @@ class ReportService {
     const reportData = {
       totalCases: cases.length,
       filters: {
-        caseType: caseType || 'All',
+        caseTypes: caseTypes || 'All',
         year: year || 'All',
         months: months || 'All',
+        reportSections: reportSections || 'All',
         isDirectionCase: isDirectionCase !== undefined ? isDirectionCase : 'All',
         isCsCalledInPerson: isCsCalledInPerson !== undefined ? isCsCalledInPerson : 'All'
       },

@@ -15,9 +15,22 @@ class ReportRepository {
       const replacements: any = {};
       
       // Add filters dynamically
-      if (filters.caseType) {
-        query += ` AND "caseType" = :caseType`;
-        replacements.caseType = filters.caseType;
+      // Handle multiple case types
+      if (filters.caseTypes && filters.caseTypes.length > 0) {
+        const caseTypePlaceholders = filters.caseTypes.map((_: string, index: number) => `:caseType${index}`).join(',');
+        query += ` AND "caseType" IN (${caseTypePlaceholders})`;
+        filters.caseTypes.forEach((caseType: string, index: number) => {
+          replacements[`caseType${index}`] = caseType;
+        });
+      }
+      
+      // Filter by subjectOfApplication
+      if (filters.subjectOfApplication && filters.subjectOfApplication.length > 0) {
+        const subjectPlaceholders = filters.subjectOfApplication.map((_: string, index: number) => `:subject${index}`).join(',');
+        query += ` AND "subjectOfApplication" IN (${subjectPlaceholders})`;
+        filters.subjectOfApplication.forEach((subject: string, index: number) => {
+          replacements[`subject${index}`] = subject;
+        });
       }
       
       // Check if caseStatus array contains specific statuses
