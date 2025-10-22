@@ -136,13 +136,26 @@ class CaseService {
   });
 
   static deleteCaseImage = asyncHandler(async (req: Request, res: Response) => {
-    const { id, imageId } = req.params;
+    const { id, imageIds } = req.query;
 
     if (!id) {
-      return res.status(400).json({ error: 'Please provide id as a route parameter' });
+      return res.status(400).json({ error: 'Please provide id ' });
     }
 
-    const result = await CaseRepository.deleteCaseImage(id, imageId);
+    let imageIdArray: string[] = [];
+    if (typeof imageIds === 'string') {
+      imageIdArray = imageIds.split(',').map(s => s.trim()).filter(Boolean);
+    } else if (Array.isArray(imageIds)) {
+      imageIdArray = imageIds
+        .map(val => (typeof val === 'string' ? val : ''))
+        .filter(Boolean);
+    }
+
+    if (imageIdArray.length === 0) {
+      return res.status(400).json({ error: 'Please provide at least one imageId' });
+    }
+
+    const result = await CaseRepository.deleteCaseImage(id, imageIdArray);
     if (!result) {
       return res.status(404).json({ error: 'Case or image not found' });
     }

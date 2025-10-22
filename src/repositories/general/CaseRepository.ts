@@ -293,15 +293,18 @@ class CaseRepository {
     }
   }
 
-  static async deleteCaseImage(id: string, imageId: string) {
+  static async deleteCaseImage(id: any, imageIds: string[]) {
     try {
-      const result = await Cases.update(
-        {
-          uploadedFiles: Cases.sequelize!.fn('array_remove', Cases.sequelize!.col('uploadedFiles'), imageId)
-        },
-        { where: { id } }
-      );
-      return result[0] > 0; // Returns true if any row was updated
+      const caseRecord = await Cases.findByPk(id);
+      if (!caseRecord) {
+        throw new Error("Case not found");
+      }
+      let uploadedFiles: string[] = Array.isArray((caseRecord as any).uploadedFiles)
+        ? (caseRecord as any).uploadedFiles
+        : [];
+      uploadedFiles = uploadedFiles.filter((file: string) => !imageIds.includes(file));
+      await caseRecord.update({ uploadedFiles });
+      return true;
     } catch (error) {
       console.error("Error deleting case image:", error);
       throw new Error("Could not delete case image");
