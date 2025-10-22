@@ -137,6 +137,7 @@ class CaseService {
 
   static deleteCaseImage = asyncHandler(async (req: Request, res: Response) => {
     const { id, imageIds } = req.query;
+    const user = req.user
 
     if (!id) {
       return res.status(400).json({ error: 'Please provide id ' });
@@ -155,12 +156,16 @@ class CaseService {
       return res.status(400).json({ error: 'Please provide at least one imageId' });
     }
 
-    const result = await CaseRepository.deleteCaseImage(id, imageIdArray);
+    const result: any = await CaseRepository.deleteCaseImage(id, imageIdArray);
     if (!result) {
-      return res.status(404).json({ error: 'Case or image not found' });
+      return res.generalError('Case or image not found');
     }
 
-    res.generalResponse('Case image deleted successfully!', result);
+    if(result) {
+      await AuditLogsRepository.logAction({ imageIds: imageIdArray }, req, result.cpNumber, 'DELETE_CASE_IMAGE');
+      res.generalResponse('Case image deleted successfully!', result);
+    }
+  
   });
 
   static calendarViewCases = asyncHandler(async (req: Request, res: Response) => {
