@@ -137,7 +137,6 @@ class CaseService {
 
   static deleteCaseImage = asyncHandler(async (req: Request, res: Response) => {
     const { id, imageIds } = req.query;
-    const user = req.user
 
     if (!id) {
       return res.status(400).json({ error: 'Please provide id ' });
