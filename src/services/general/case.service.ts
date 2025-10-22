@@ -80,6 +80,10 @@ class CaseService {
     if ('caseNumber' in caseData) {
       delete caseData.caseNumber;
     }
+    const existingCase: any = await CaseRepository.getCaseById(Number(id));
+    if (!existingCase) {
+      return res.status(404).json({ error: 'Case not found' });
+    }
 
     // if (userType === 'REVIEWER') {
     //   const allowedFields = ['court', 'region', 'relativeDepartment', 'caseStatus', 'isUrgent', 'isCallToAttention', 'isCsCalledInPerson'];
@@ -94,12 +98,21 @@ class CaseService {
     //     return res.status(403).json({ error: 'you are not allowed to do this' });
     //   }
     // }
+    // Filter uploadedFiles: only new files for audit log, don't pass to updateCase
+    let auditLogPayload = { ...req.body };
+    if (Array.isArray(caseData.uploadedFiles) && Array.isArray(existingCase.uploadedFiles)) {
+      const newFiles = caseData.uploadedFiles.filter(
+        (file) => !existingCase.uploadedFiles.includes(file)
+      );
+      auditLogPayload.uploadedFiles = newFiles;
+    }
+    console.log("Updating case:", id, caseData);
     const updatedCase: any = await CaseRepository.updateCase(Number(id), caseData);
     if (!updatedCase) {
       return res.status(404).json({ error: 'Case not found' });
     }
     // Log audit action for case update
-    await AuditLogsRepository.logAction(req.body, req, updatedCase.cpNumber, 'UPDATE_CASE');
+    await AuditLogsRepository.logAction(auditLogPayload, req, updatedCase.cpNumber, 'UPDATE_CASE');
     res.generalResponse('Case updated successfully!', updatedCase);
   });
 
