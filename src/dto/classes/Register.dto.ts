@@ -15,19 +15,11 @@ export default class RegisterDTO {
 
   @IsNotEmpty()
   @IsString()
-  govtID!: string;
-
-  @IsNotEmpty()
-  @IsString()
   designation!: string;
   
   @IsNotEmpty()
   @IsString()
   roleType!: string;
-
-  @IsNotEmpty()
-  @IsString()
-  deptID!: string;
 
   // @IsNotEmpty()
   // @IsString()
