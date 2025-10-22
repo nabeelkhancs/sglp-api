@@ -145,10 +145,8 @@ class UserService {
     dto.name = req.body.name;
     dto.cnic = req.body.cnic;
     dto.email = req.body.email;
-    dto.govtID = req.body.govtID;
     dto.designation = req.body.designation;
     dto.roleType = req.body.roleType;
-    dto.deptID = req.body.deptID;
     dto.dptIdDoc = req.body.dptIdDoc;
     dto.password = req.body.password;
     let roleId: number;
@@ -176,10 +174,8 @@ class UserService {
         name: createdUser.name,
         cnic: createdUser.cnic,
         email: createdUser.email,
-        govtID: createdUser.govtID,
         designation: createdUser.designation,
         roleType: createdUser.roleType,
-        deptID: createdUser.deptID,
         dptIdDoc: createdUser.dptIdDoc,
         status: createdUser.status,
       };
@@ -391,9 +387,7 @@ class UserService {
             name: user.name,
             cnic: user.cnic,
             email: user.email,
-            govtID: user.govtID,
             designation: user.designation,
-            deptID: user.deptID,
             dptIdDoc: user.dptIdDoc,
             status: user.status,
             roleId: user.roleId,
