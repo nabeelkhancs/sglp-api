@@ -303,8 +303,8 @@ class CaseRepository {
         ? (caseRecord as any).uploadedFiles
         : [];
       uploadedFiles = uploadedFiles.filter((file: string) => !imageIds.includes(file));
-      await caseRecord.update({ uploadedFiles });
-      return caseRecord;
+      const res = await caseRecord.update({ uploadedFiles });
+      return res;
     } catch (error) {
       console.error("Error deleting case image:", error);
       throw new Error("Could not delete case image");
