@@ -174,7 +174,7 @@ class CaseService {
     }
 
     if(result) {
-      await AuditLogsRepository.logAction({ imageIds: imageIdArray }, req, result.cpNumber, 'DELETE_CASE_IMAGE');
+      await AuditLogsRepository.logAction({ imageIds: imageIdArray }, req, result?.dataValues?.cpNumber || result?.cpNumber, 'DELETE_CASE_IMAGE');
       res.generalResponse('Case image deleted successfully!', result);
     }
   

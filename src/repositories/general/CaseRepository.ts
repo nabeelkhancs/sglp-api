@@ -304,8 +304,6 @@ class CaseRepository {
         : [];
       uploadedFiles = uploadedFiles.filter((file: string) => !imageIds.includes(file));
       const res = await caseRecord.update({ uploadedFiles });
-      console.log("Deleted case image, updated record:", res);
-      console.log("caseRecord after deletion:", caseRecord);
       return res;
     } catch (error) {
       console.error("Error deleting case image:", error);
