@@ -101,6 +101,10 @@ Cases.init(
       type: DataTypes.STRING,
       allowNull: false
     },
+    fileNumber: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     caseType: {
       type: DataTypes.STRING,
       allowNull: true,

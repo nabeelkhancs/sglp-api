@@ -4,6 +4,7 @@ import CaseService from "../../../services/general/case.service";
 const router: Router = express.Router();
 
 router.post("/",CaseService.createCase)
+router.get("/report", CaseService.reportCases)
 router.get("/search", CaseService.searchCases)
 router.get("/notice-board", CaseService.noticeBoardCases)
 router.get("/calendar", CaseService.calendarViewCases)

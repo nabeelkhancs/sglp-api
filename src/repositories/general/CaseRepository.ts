@@ -221,6 +221,7 @@ class CaseRepository {
         whereClause[Op.or] = [
           { cpNumber: { [Op.like]: `%${queryString}%` } },
           { caseTitle: { [Op.like]: `%${queryString}%` } },
+          { fileNumber: { [Op.like]: `%${queryString}%` } },
         ];
       }
 
@@ -229,6 +230,7 @@ class CaseRepository {
         attributes: [
           'cpNumber',
           'caseNumber',
+          'fileNumber',
           'caseTitle',
           'dateOfHearing',
           'dateReceived',
@@ -411,6 +413,37 @@ class CaseRepository {
     } catch (error) {
       console.error("Error fetching notice board cases:", error);
       throw new Error("Could not fetch notice board cases");
+    }
+  }
+
+  static async reportCases(filters: any): Promise<any> {
+    try {
+      const whereClause: any = { isDeleted: false };
+      if (filters.startDate) {
+        whereClause.dateReceived = { [Op.gte]: new Date(filters.startDate) };
+      }
+      if (filters.endDate) {
+        whereClause.dateReceived = whereClause.dateReceived || {};
+        whereClause.dateReceived[Op.lte] = new Date(filters.endDate);
+      }
+      if (filters.caseStatus) {
+        whereClause.caseStatus = filters.caseStatus;
+      }
+      if (filters.court) {
+        whereClause.court = filters.court;
+      }
+      if (filters.region) {
+        whereClause.region = filters.region;
+      }
+
+      const cases = await Cases.findAll({
+        where: whereClause
+      });
+
+      return cases;
+    } catch (error) {
+      console.error("Error fetching report cases:", error);
+      throw new Error("Could not fetch report cases");
     }
   }
 }

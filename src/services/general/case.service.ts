@@ -195,6 +195,30 @@ class CaseService {
     res.generalResponse('Notice board cases fetched successfully!', result);
   });
 
+
+  static reportCases = asyncHandler(async (req: Request, res: Response) => {
+    const { startDate, endDate, caseStatus, court, region } = req.query;
+    const filters: any = {};
+
+    if (startDate) {
+      filters.startDate = String(startDate);
+    }
+    if (endDate) {
+      filters.endDate = String(endDate);
+    }
+    if (caseStatus) {
+      filters.caseStatus = String(caseStatus);
+    }
+    if (court) {
+      filters.court = String(court);
+    }
+    if (region) {
+      filters.region = String(region);
+    }
+
+    const result = await CaseRepository.reportCases(filters);
+    res.generalResponse('Case report fetched successfully!', result);
+  });
 }
 
 export default CaseService;
