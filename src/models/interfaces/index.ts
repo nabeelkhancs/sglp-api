@@ -158,7 +158,7 @@ export interface ICases {
   deletedAt?: Date | null;
   isCsCalledInPerson?: boolean;
   cpNumber: string;
-  fileNumber: string;
+  fileNumber?: string;
   caseType?: string;
   registry?: string;
 }

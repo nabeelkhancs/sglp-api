@@ -103,7 +103,7 @@ Cases.init(
     },
     fileNumber: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     caseType: {
       type: DataTypes.STRING,
