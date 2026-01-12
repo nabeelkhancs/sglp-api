@@ -436,8 +436,24 @@ class CaseRepository {
         whereClause.region = filters.region;
       }
 
+      const { literal } = require('sequelize');
       const cases = await Cases.findAll({
-        where: whereClause
+        where: whereClause,
+        attributes: [
+          'id',
+          'cpNumber',
+          'fileNumber',
+          'caseTitle',
+          'caseType',
+          'court',
+          'region',
+          [literal('dateReceived'), 'dateOfOrder'],
+          'dateOfHearing',
+          'caseStatus',
+          'relativeDepartment',
+          [literal('subjectOfApplication'), 'typeOfAction'],
+          'caseRemarks'
+        ]
       });
 
       return cases;
