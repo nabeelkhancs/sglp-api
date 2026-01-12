@@ -447,7 +447,7 @@ class CaseRepository {
           'caseType',
           'court',
           'region',
-          [literal('dateReceived'), 'dateOfOrder'],
+          'dateReceived',
           'dateOfHearing',
           'caseStatus',
           'relativeDepartment',
