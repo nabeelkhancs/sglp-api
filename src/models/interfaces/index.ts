@@ -161,6 +161,8 @@ export interface ICases {
   fileNumber?: string;
   caseType?: string;
   registry?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 export interface ICommittee {
   id?: number;
