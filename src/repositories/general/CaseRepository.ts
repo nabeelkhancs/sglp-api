@@ -451,7 +451,7 @@ class CaseRepository {
           'dateOfHearing',
           'caseStatus',
           'relativeDepartment',
-          [literal('subjectOfApplication'), 'typeOfAction'],
+          'subjectOfApplication',
           'caseRemarks'
         ]
       });
