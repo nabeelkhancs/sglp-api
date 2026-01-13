@@ -36,7 +36,7 @@ class CronController {
 
   static async checkUpcomingHearings(req: Request, res: Response): Promise<void> {
     try {
-      await HearingReminderService.checkUpcomingHearings();
+      await HearingReminderService.checkUpcomingHearings24Hours();
       
       res.status(200).json(
         APIResponse.success(
