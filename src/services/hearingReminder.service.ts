@@ -1,3 +1,4 @@
+
 import Cases from '../models/Case';
 import Notifications from '../models/Notifications';
 import { User } from '../models';
@@ -14,8 +15,99 @@ interface HearingReminder {
 }
 
 class HearingReminderService {
+  /**
+   * Check hearings 2 and 5 days before the hearing date
+   */
+  static async checkHearings2And5DaysBefore(): Promise<void> {
+    try {
+      const now = new Date();
+      // 2 days and 5 days from now
+      const twoDaysLater = new Date(now.getTime() + (2 * 24 * 60 * 60 * 1000));
+      const fiveDaysLater = new Date(now.getTime() + (5 * 24 * 60 * 60 * 1000));
+
+      // Find cases with hearings exactly 2 or 5 days from now (ignore time part)
+      const startOfTwoDay = new Date(twoDaysLater);
+      startOfTwoDay.setHours(0, 0, 0, 0);
+      const endOfTwoDay = new Date(twoDaysLater);
+      endOfTwoDay.setHours(23, 59, 59, 999);
+
+      const startOfFiveDay = new Date(fiveDaysLater);
+      startOfFiveDay.setHours(0, 0, 0, 0);
+      const endOfFiveDay = new Date(fiveDaysLater);
+      endOfFiveDay.setHours(23, 59, 59, 999);
+
+      // Query for both 2 days and 5 days
+      const cases = await Cases.findAll({
+        where: {
+          dateOfHearing: {
+            [Op.or]: [
+              { [Op.between]: [startOfTwoDay, endOfTwoDay] },
+              { [Op.between]: [startOfFiveDay, endOfFiveDay] }
+            ]
+          },
+          isDeleted: false
+        },
+        attributes: ['id', 'cpNumber', 'caseTitle', 'dateOfHearing']
+      });
+
+      console.log(`Found ${cases.length} cases with hearings in 2 or 5 days`);
+
+      for (const caseItem of cases) {
+        const caseData = caseItem.toJSON() as any;
+        const hearingDate = new Date(caseData.dateOfHearing);
+        const daysUntilHearing = Math.ceil((hearingDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        let reminderType: '2day' | '5day' = daysUntilHearing === 2 ? '2day' : '5day';
+
+        // Check if notification already sent for this type
+        const notificationType = reminderType === '2day' ? 'HEARING_REMINDER_2DAY' : 'HEARING_REMINDER_5DAY';
+        const alreadySent = await Notifications.findOne({
+          where: {
+            type: notificationType,
+            cpNumber: caseData.cpNumber
+          }
+        });
+        if (alreadySent) {
+          console.log(`✓ ${reminderType} reminder already sent for case ${caseData.cpNumber} - skipping`);
+          continue;
+        }
+
+        // Get all active users for notification
+        const users = await User.findAll({
+          where: {
+            status: 'Approved',
+            isActive: true,
+            isEmailVerify: true,
+            isDeleted: false
+          },
+          attributes: ['id']
+        });
+        if (users.length === 0) {
+          console.log('No active users found for hearing reminder notifications');
+          continue;
+        }
+
+        // Create notifications for all users
+        const notifications = users.map((user: any) => ({
+          type: notificationType,
+          to: String(user.id),
+          isRead: false,
+          cpNumber: caseData.cpNumber,
+          caseTitle: caseData.caseTitle,
+          dateOfHearing: hearingDate.toString(),
+          createdBy: '1',
+          createdAt: new Date(),
+          updatedBy: '1'
+        }));
+        await Notifications.bulkCreate(notifications);
+        console.log(`✓ ${reminderType} hearing reminder created for case ${caseData.cpNumber} - ${users.length} users notified`);
+      }
+    } catch (error) {
+      console.error('Error in checkHearings2And5DaysBefore:', error);
+      throw error;
+    }
+  }
   
-  static async checkUpcomingHearings(): Promise<void> {
+  static async checkUpcomingHearings24Hours(): Promise<void> {
     try {
       const now = new Date();
       const twentyFourHoursLater = new Date(now.getTime() + (24 * 60 * 60 * 1000));
@@ -209,7 +301,7 @@ class HearingReminderService {
     try {
       console.log('Manual hearing reminder check triggered');
       
-      await this.checkUpcomingHearings();
+      await this.checkUpcomingHearings24Hours();
       await this.checkFinalReminders();
 
       return {
