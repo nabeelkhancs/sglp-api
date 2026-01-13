@@ -38,29 +38,29 @@ class AuditLogsRepository {
       });
 
       // Import User model here to avoid circular dependency
-      const User = (await import('../../models/Users')).default;
-      const users = await User.findAll({
-        where: {
-          status: 'Approved',
-          isActive: true,
-          isEmailVerify: true,
-          isDeleted: false
-        },
-        attributes: ['id']
-      });
-      console.log('Users found for notification:', users.length);
-      const notifications = users.map((user: any) => ({
-        type: log.action,
-        to: String(user.id),
-        auditLogId: log.id,
-        createdBy: log.createdBy ?? null,
-        updatedBy: log.updatedBy ?? null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }));
-      if (notifications.length > 0) {
-        await Notifications.bulkCreate(notifications);
-      }
+      // const User = (await import('../../models/Users')).default;
+      // const users = await User.findAll({
+      //   where: {
+      //     status: 'Approved',
+      //     isActive: true,
+      //     isEmailVerify: true,
+      //     isDeleted: false
+      //   },
+      //   attributes: ['id']
+      // });
+      // console.log('Users found for notification:', users.length);
+      // const notifications = users.map((user: any) => ({
+      //   type: log.action,
+      //   to: String(user.id),
+      //   auditLogId: log.id,
+      //   createdBy: log.createdBy ?? null,
+      //   updatedBy: log.updatedBy ?? null,
+      //   createdAt: new Date(),
+      //   updatedAt: new Date(),
+      // }));
+      // if (notifications.length > 0) {
+      //   await Notifications.bulkCreate(notifications);
+      // }
     } catch (error) {
       console.error('Error logging audit action:', error);
     }

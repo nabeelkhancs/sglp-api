@@ -6,7 +6,7 @@ class CronJobs {
     console.log('Initializing cron jobs...');
 
     // Run every hour to check for upcoming hearings (24 hours before)
-    cron.schedule('0 * * * *', async () => {
+    cron.schedule('* * * * *', async () => {
       console.log('Running hourly hearing reminder cron job at:', new Date().toISOString());
       try {
         await HearingReminderService.checkUpcomingHearings();
