@@ -110,6 +110,7 @@ class CommitteeRepository {
       uploadedFiles = uploadedFiles.filter((file: string) => !imageIds.includes(file));
       console.log("Updated uploadedFiles after deletion:", uploadedFiles);
       const res = await committeeRecord.update({ uploadedFiles });
+      console.log("Committee record after image deletion:", res);
       return res;
     } catch (error) {
       console.error("Error deleting committee image:", error);
