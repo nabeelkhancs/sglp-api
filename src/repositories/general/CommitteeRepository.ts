@@ -99,7 +99,7 @@ class CommitteeRepository {
 
   static async deleteCommitteeImage(id: any, imageIds: string[]) {
     try {
-      const committeeRecord = await Committee.findByPk(id);
+      const committeeRecord: any = await Committee.findByPk(id);
       console.log("Committee record fetched for image deletion:", committeeRecord);
       if (!committeeRecord) {
         throw new Error("Committee not found");
@@ -109,7 +109,10 @@ class CommitteeRepository {
         : [];
       uploadedFiles = uploadedFiles.filter((file: string) => !imageIds.includes(file));
       console.log("Updated uploadedFiles after deletion:", uploadedFiles);
-      const res = await committeeRecord.update({ uploadedFiles });
+      committeeRecord.uploadedFiles = uploadedFiles;
+
+      const res = await committeeRecord.save();
+      // const res = await committeeRecord.update({ uploadedFiles });
       console.log("Committee record after image deletion:", res);
       return res;
     } catch (error) {
