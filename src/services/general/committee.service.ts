@@ -74,6 +74,37 @@ class CommitteeService {
     await CommitteeRepository.deleteCommittee(Number(id));
     res.generalResponse('Committee deleted successfully!');
   });
+
+  static deleteCommitteeImage = asyncHandler(async (req: Request, res: Response) => {
+    const { id, imageIds } = req.query;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Please provide id' });
+    }
+
+    let imageIdArray: string[] = [];
+    if (typeof imageIds === 'string') {
+      imageIdArray = imageIds.split(',').map(s => s.trim()).filter(Boolean);
+    } else if (Array.isArray(imageIds)) {
+      imageIdArray = imageIds
+        .map(val => (typeof val === 'string' ? val : ''))
+        .filter(Boolean);
+    }
+
+    if (imageIdArray.length === 0) {
+      return res.status(400).json({ error: 'Please provide at least one imageId' });
+    }
+
+    const result: any = await CommitteeRepository.deleteCommitteeImage(id, imageIdArray);
+    if (!result) {
+      return res.generalError('Committee or image not found');
+    }
+
+    if (result) {
+      await AuditLogsRepository.logAction({ imageIds: imageIdArray }, req, result?.dataValues?.cpNumber || result?.cpNumber, 'DELETE_COMMITTEE_IMAGE');
+      res.generalResponse('Committee image deleted successfully!', result);
+    }
+  });
 }
 
 export default CommitteeService;

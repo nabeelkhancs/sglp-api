@@ -9,6 +9,7 @@ router.post("/", validateDTO(CommitteeDTO), CommitteeService.create);
 router.put("/:id", CommitteeService.update);
 router.get("/:id", CommitteeService.get);
 router.get("/", CommitteeService.getAll);
+router.delete("/images", CommitteeService.deleteCommitteeImage)
 router.delete("/:id", CommitteeService.delete);
 
 export default router;

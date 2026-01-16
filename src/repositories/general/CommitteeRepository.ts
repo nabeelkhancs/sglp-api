@@ -96,6 +96,24 @@ class CommitteeRepository {
       throw new Error("Could not fetch committee by cpNumber");
     }
   }
+
+  static async deleteCommitteeImage(id: any, imageIds: string[]) {
+    try {
+      const committeeRecord = await Committee.findByPk(id);
+      if (!committeeRecord) {
+        throw new Error("Committee not found");
+      }
+      let uploadedFiles: string[] = Array.isArray((committeeRecord as any).uploadedFiles)
+        ? (committeeRecord as any).uploadedFiles
+        : [];
+      uploadedFiles = uploadedFiles.filter((file: string) => !imageIds.includes(file));
+      const res = await committeeRecord.update({ uploadedFiles });
+      return res;
+    } catch (error) {
+      console.error("Error deleting committee image:", error);
+      throw new Error("Could not delete committee image");
+    }
+  }
 }
 
 export default CommitteeRepository;
