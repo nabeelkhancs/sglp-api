@@ -96,6 +96,8 @@ class CommitteeService {
     }
 
     const result: any = await CommitteeRepository.deleteCommitteeImage(id, imageIdArray);
+    console.log("Result after deleting committee image:", result);
+    console.log("id:", id, "imageIds:", imageIdArray);
     if (!result) {
       return res.generalError('Committee or image not found');
     }

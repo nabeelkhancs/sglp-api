@@ -23,7 +23,6 @@ class AuditLogsRepository {
    */
   static async logAction(body: any, req: Request, cpNumber?: string, action: string = 'ACTION') {
     try {
-      console.log('Logging audit action:', body);
       const userId = req.user?.id || 1;
       const log: any = await AuditLogs.create({
         action,
