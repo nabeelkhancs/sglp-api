@@ -100,6 +100,7 @@ class CommitteeRepository {
   static async deleteCommitteeImage(id: any, imageIds: string[]) {
     try {
       const committeeRecord = await Committee.findByPk(id);
+      console.log("Committee record fetched for image deletion:", committeeRecord);
       if (!committeeRecord) {
         throw new Error("Committee not found");
       }
