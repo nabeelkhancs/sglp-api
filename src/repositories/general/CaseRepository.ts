@@ -420,11 +420,11 @@ class CaseRepository {
     try {
       const whereClause: any = { isDeleted: false };
       if (filters.startDate) {
-        whereClause.dateReceived = { [Op.gte]: new Date(filters.startDate) };
+        whereClause.createdAt = { [Op.gte]: new Date(filters.startDate) };
       }
       if (filters.endDate) {
-        whereClause.dateReceived = whereClause.dateReceived || {};
-        whereClause.dateReceived[Op.lte] = new Date(filters.endDate);
+        whereClause.createdAt = whereClause.createdAt || {};
+        whereClause.createdAt[Op.lte] = new Date(filters.endDate);
       }
       if (filters.caseStatus) {
         whereClause.caseStatus = filters.caseStatus;
