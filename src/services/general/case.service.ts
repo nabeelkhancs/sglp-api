@@ -219,6 +219,15 @@ class CaseService {
     const result = await CaseRepository.reportCases(filters);
     res.generalResponse('Case report fetched successfully!', result);
   });
+
+  static deleteCase = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.query;
+    if (!id) {
+      return res.status(400).json({ error: 'Please provide id' });
+    }
+    await CaseRepository.deleteCase(Number(id), req.user.id);
+    res.generalResponse('Case deleted successfully!');
+  });
 }
 
 export default CaseService;

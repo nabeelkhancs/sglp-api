@@ -64,13 +64,13 @@ class CaseRepository {
     }
   }
 
-  static async deleteCase(id: number): Promise<void> {
+  static async deleteCase(id: number, userId: string): Promise<void> {
     try {
       const caseRecord = await Cases.findByPk(id);
       if (!caseRecord) {
         throw new Error("Case not found");
       }
-      await caseRecord.update({ isDeleted: true });
+      await caseRecord.update({ isDeleted: true, deletedBy: Number(userId), deletedAt: new Date() });
     } catch (error) {
       console.error("Error deleting case:", error);
       throw new Error("Could not delete case");

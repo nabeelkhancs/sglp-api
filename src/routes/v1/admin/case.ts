@@ -14,5 +14,6 @@ router.delete("/images", CaseService.deleteCaseImage)
 router.put("/:id", CaseService.updateCase)
 router.get("/:id", CaseService.getCase)
 router.get("/", CaseService.getAllCases)
+router.delete("/", CaseService.deleteCase)
 
 export default router;
