@@ -100,7 +100,7 @@ class CommonService {
 
   static async getDashboardCases(req: Request, res: Response) {
     const cases = await CaseRepository.getDashboardCases();
-    const committees = await CommitteeRepository.getCommittees();
+    const committees = await CommitteeRepository.getCommittees(1, 10000000000000000000000000000);
     res.generalResponse('Dashboard cases fetched successfully!', { cases, committees: committees?.rows });
   }
 
