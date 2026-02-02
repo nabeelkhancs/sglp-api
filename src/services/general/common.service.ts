@@ -6,6 +6,7 @@ import CommitteeRepository from '../../repositories/general/CommitteeRepository'
 import uploadsService from './uploads.service';
 import Uploads from '../../models/Uploads';
 import SequelizeClass from '../../../database/sequelize';
+import { Committee } from '../../models';
 
 class CommonService {
   static async getPageActionsByRole(roleId: number, pageLabel: string) {
@@ -100,7 +101,10 @@ class CommonService {
 
   static async getDashboardCases(req: Request, res: Response) {
     const cases = await CaseRepository.getDashboardCases();
-    const committees = await CommitteeRepository.getCommittees(1, 10000000000000000000000000000);
+    const committees = await Committee.findAndCountAll({
+      where: { isDeleted: false },
+      order: [['updatedAt', 'DESC']],
+    });
     res.generalResponse('Dashboard cases fetched successfully!', { cases, committees: committees?.rows });
   }
 
