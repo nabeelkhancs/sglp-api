@@ -14,11 +14,13 @@ import AuthMiddleware from "../../../auth/jwt";
 import notificationsRoutes from "./notifications";
 import cronRoutes from "./cron";
 import CommonService from "../../../services/general/common.service";
+import UserService from "../../../services/general/user.service";
 
 
 const router: Router = express.Router();
 
 router.use('/auth', authRoute)
+router.get("/user/type", UserService.getUserType)
 router.use("/modules", AuthMiddleware.auth, moduleRoutes)
 router.use("/pages", pageRoutes)
 router.use("/roles", AuthMiddleware.auth, roleRoutes)

@@ -215,6 +215,14 @@ class UserRepository {
     return latestRecord;
   }
 
+  static async getUserType(email: string): Promise<any> {
+    const user: any = await User.findOne({ where: { email } });
+    if (!user) {
+      return null;
+    }
+    return user.roleType;
+  }
+
   private static sortByOrder(array: any[]) {
     return array.sort((a, b) => a.order - b.order);
   };
@@ -227,6 +235,7 @@ class UserRepository {
       return item;
     });
   }
+  
 }
 
 export default UserRepository;

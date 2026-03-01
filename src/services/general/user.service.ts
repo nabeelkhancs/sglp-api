@@ -475,6 +475,12 @@ class UserService {
     }
   });
 
+  static getUserType = asyncHandler(async (req: Request, res: Response) => {
+    const { email } = req.query;
+    const result = await UserRepository.getUserType(email as string);
+    res.generalResponse('Data fetched successfuly!', result)
+  })
+
 }
 
 export default UserService;
