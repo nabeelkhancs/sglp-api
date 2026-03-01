@@ -221,7 +221,7 @@ class UserRepository {
       return null;
     }
     console.log("user.roleType", user.roleType);
-    return { roleType: user.roleType };
+    return { roleType: user.type };
   }
 
   private static sortByOrder(array: any[]) {
